@@ -14,17 +14,16 @@ const Settings = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('get envs')
     falcor.get(["dama-info", "pgEnvs"])
     .then(data => console.log('hello', data));
   }, []);
   
   const pgEnv = useSelector(selectPgEnv);
+  
+
   const pgEnvs = React.useMemo(() => {
-    console.log('testing')
     return get(falcorCache, ["dama-info", "pgEnvs", "value"], []);
   },[falcorCache]);
-
 
 
   if (!pgEnvs) {
