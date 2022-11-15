@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useFalcor, Button } from 'modules/avl-components/src'
 import get from 'lodash.get'
 // import { useParams } from 'react-router-dom'
-import FreightAtlasLayer from './FreightAtlasLayer'
 import { AvlMap } from "modules/avl-map/src"
 
 import Create from './create'
@@ -12,39 +11,10 @@ import config from "config.json"
     
 const Map = ({layers}) => {
     
-    console.log('layers', layers)
-    
-    const mapOptions =  {
-        zoom: 6.2,
-        center: [
-            -75.95,
-           42.89
-        ],
-        logoPosition: "bottom-right",
-        styles: [
-            {name: "Light",
-                style: 'mapbox://styles/am3081/ckm86j4bw11tj18o5zf8y9pou' },
-            {name: "Blank Road Labels",
-                style: 'mapbox://styles/am3081/cl0ieiesd000514mop5fkqjox'},
-            {name: "Dark",
-                style: 'mapbox://styles/am3081/ckm85o7hq6d8817nr0y6ute5v' }
-        ]
-    }
-    
- 
-    const map_layers = useMemo(() => {
-      return layers.map(l => FreightAtlasLayer(l))
-    },[])
-    
     return (
         
         <div className='w-full h-full'>   
-            <AvlMap
-                accessToken={ config.MAPBOX_TOKEN }
-                mapOptions={ mapOptions }
-                layers={map_layers}
-                CustomSidebar={() => <div/>}
-            />
+
         </div>
        
     )
@@ -196,7 +166,7 @@ const Table = ({source}) => {
 
 
 
-const NceiStormEventsConfig = {
+const FreightAtlashShapefileConfig = {
   map: {
     name: 'Map',
     path: '/map',
@@ -214,4 +184,4 @@ const NceiStormEventsConfig = {
 
 }
 
-export default NceiStormEventsConfig
+export default FreightAtlashShapefileConfig
