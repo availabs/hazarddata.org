@@ -31,7 +31,7 @@ const createNewDataSource = async (rtPfx, source) => {
         body: JSON.stringify({
             name: sourceName,
             display_name: sourceDisplayName,
-            type: "ncei_storm_events",
+            type: "ncei_storm_vents_enhanced",
         }),
         headers: {
             "Content-Type": "application/json",
@@ -53,6 +53,7 @@ async function submitViewMeta({rtPfx, etlContextId, userId, sourceName}) {
     const viewMetadata = {
         data_source_name: sourceName,
         version: 1,
+
     };
 
     const res = await fetch(url, {
@@ -101,7 +102,7 @@ const getSrcViews = async ({rtPfx, setVersions, etlContextId, type}) => {
 
 
 }
-const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewZTC={}, viewCousubs={}, viewTract={}}) => {
+const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewNCEI={},viewZTC={}, viewCousubs={}, viewTract={}}) => {
     const { name: sourceName, display_name: sourceDisplayName } = source;
 
     const src = await createNewDataSource(rtPfx, source);
@@ -109,11 +110,13 @@ const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewZTC
     await submitViewMeta({rtPfx, etlContextId, userId, sourceName})
 
     const url = new URL(
-        `${rtPfx}/staged-geospatial-dataset/loadNCEI`
+        `${rtPfx}/staged-geospatial-dataset/enhanceNCEI`
     );
     url.searchParams.append("etl_context_id", etlContextId);
-    url.searchParams.append("table_name", 'details');
-    // url.searchParams.append("src_id", src.id);
+    url.searchParams.append("table_name", 'details_enhanced');
+    url.searchParams.append("src_id", src.id);
+    url.searchParams.append("ncei_schema", viewNCEI.table_schema);
+    url.searchParams.append("ncei_table", viewNCEI.table_name);
     url.searchParams.append("tract_schema", viewTract.table_schema);
     url.searchParams.append("tract_table", viewTract.table_name);
     url.searchParams.append("ztc_schema", viewZTC.table_schema);
@@ -170,10 +173,12 @@ const Create = ({ source }) => {
     const [viewZTC, setViewZTC] = React.useState();
     const [viewCousubs, setViewCousubs] = React.useState();
     const [viewTract, setViewTract] = React.useState();
+    const [viewNCEI, setViewNCEI] = React.useState();
     // all versions
     const [versionsZTC, setVersionsZTC] = React.useState({sources:[], views: []});
     const [versionsCousubs, setVersionsCousubs] = React.useState({sources:[], views: []});
     const [versionsTract, setVersionsTract] = React.useState({sources:[], views: []});
+    const [versionsNCEI, setVersionsNCEI] = React.useState({sources:[], views: []});
 
     const pgEnv = useSelector(selectPgEnv);
     const userId = useSelector(selectUserId);
@@ -193,12 +198,14 @@ const Create = ({ source }) => {
             await getSrcViews({rtPfx, setVersions: setVersionsZTC, etlContextId: etl, type: 'zone_to_county'});
             await getSrcViews({rtPfx, setVersions: setVersionsCousubs, etlContextId: etl, type: 'tl_cousub'});
             await getSrcViews({rtPfx, setVersions: setVersionsTract, etlContextId: etl, type: 'tl_tract'});
+            await getSrcViews({rtPfx, setVersions: setVersionsNCEI, etlContextId: etl, type: 'ncei_storm_events'});
         }
         fetchData();
     }, [])
 
     return (
         <div className='w-full'>
+            {RenderVersions({value: viewNCEI, setValue: setViewNCEI, versions: versionsNCEI, type: 'NCEI Storm Events'})}
             {RenderVersions({value: viewZTC, setValue: setViewZTC, versions: versionsZTC, type: 'Zone to County'})}
             {RenderVersions({value: viewCousubs, setValue: setViewCousubs, versions: versionsCousubs, type: 'Cousubs'})}
             {RenderVersions({value: viewTract, setValue: setViewTract, versions: versionsTract, type: 'Tracts'})}
@@ -207,6 +214,7 @@ const Create = ({ source }) => {
                 onClick={() =>
                     CallServer(
                         {rtPfx, source, history, etlContextId, userId,
+                            viewNCEI: versionsNCEI.views.find(v => v.id == viewNCEI),
                             viewZTC: versionsZTC.views.find(v => v.id == viewZTC),
                             viewCousubs: versionsCousubs.views.find(v => v.id == viewCousubs),
                             viewTract: versionsTract.views.find(v => v.id == viewTract),
