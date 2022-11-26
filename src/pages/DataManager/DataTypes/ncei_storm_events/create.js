@@ -101,7 +101,7 @@ const getSrcViews = async ({rtPfx, setVersions, etlContextId, type}) => {
 
 
 }
-const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewZTC={}, viewCousubs={}, viewTract={}}) => {
+const CallServer = async ({rtPfx, source, history, etlContextId, userId}) => {
     const { name: sourceName, display_name: sourceDisplayName } = source;
 
     const src = await createNewDataSource(rtPfx, source);
@@ -113,13 +113,7 @@ const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewZTC
     );
     url.searchParams.append("etl_context_id", etlContextId);
     url.searchParams.append("table_name", 'details');
-    // url.searchParams.append("src_id", src.id);
-    url.searchParams.append("tract_schema", viewTract.table_schema);
-    url.searchParams.append("tract_table", viewTract.table_name);
-    url.searchParams.append("ztc_schema", viewZTC.table_schema);
-    url.searchParams.append("ztc_table", viewZTC.table_name);
-    url.searchParams.append("cousub_schema", viewCousubs.table_schema);
-    url.searchParams.append("cousub_table", viewCousubs.table_name);
+    url.searchParams.append("src_id", src.id);
 
     const stgLyrDataRes = await fetch(url);
 
@@ -129,51 +123,9 @@ const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewZTC
     history.push(`/datasources/source/${src.id}`);
 }
 
-const RenderVersions = ({value, setValue, versions, type}) => {
-    return (
-        <div  className='flex justify-between group'>
-            <div  className="flex-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500 py-5">Select {type} version: </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <div className='pt-3 pr-8'>
-                        <select
-                            className='w-full bg-white p-3 flex-1 shadow bg-grey-50 focus:bg-blue-100  border-gray-300'
-                            value={value || ''}
-                            onChange={e => {
-                                setValue(e.target.value)
-                            }}>
-                            <option value="" disabled >Select your option</option>
-                            {versions.views
-                                .map(v =>
-                                    <option
-                                        key={v.id}
-                                        value={v.id} className='p-2'>
-                                        {get(versions.sources.find(s => s.id === v.source_id), 'display_name')}
-                                        {` (${v.id} ${formatDate(v.last_updated)})`}
-                                    </option>)
-                            }
-                        </select>
-                    </div>
-
-
-                </dd>
-            </div>
-        </div>
-    )
-}
-
 const Create = ({ source }) => {
     const history = useHistory();
     const [etlContextId, setEtlContextId] = React.useState();
-
-    // selected views/versions
-    const [viewZTC, setViewZTC] = React.useState();
-    const [viewCousubs, setViewCousubs] = React.useState();
-    const [viewTract, setViewTract] = React.useState();
-    // all versions
-    const [versionsZTC, setVersionsZTC] = React.useState({sources:[], views: []});
-    const [versionsCousubs, setVersionsCousubs] = React.useState({sources:[], views: []});
-    const [versionsTract, setVersionsTract] = React.useState({sources:[], views: []});
 
     const pgEnv = useSelector(selectPgEnv);
     const userId = useSelector(selectUserId);
@@ -190,27 +142,16 @@ const Create = ({ source }) => {
         async function fetchData() {
             const etl = await newETL({rtPfx, setEtlContextId});
             setEtlContextId(etl);
-            await getSrcViews({rtPfx, setVersions: setVersionsZTC, etlContextId: etl, type: 'zone_to_county'});
-            await getSrcViews({rtPfx, setVersions: setVersionsCousubs, etlContextId: etl, type: 'tl_cousub'});
-            await getSrcViews({rtPfx, setVersions: setVersionsTract, etlContextId: etl, type: 'tl_tract'});
         }
         fetchData();
     }, [])
 
     return (
         <div className='w-full'>
-            {RenderVersions({value: viewZTC, setValue: setViewZTC, versions: versionsZTC, type: 'Zone to County'})}
-            {RenderVersions({value: viewCousubs, setValue: setViewCousubs, versions: versionsCousubs, type: 'Cousubs'})}
-            {RenderVersions({value: viewTract, setValue: setViewTract, versions: versionsTract, type: 'Tracts'})}
             <button
                 className={`align-right`}
                 onClick={() =>
-                    CallServer(
-                        {rtPfx, source, history, etlContextId, userId,
-                            viewZTC: versionsZTC.views.find(v => v.id == viewZTC),
-                            viewCousubs: versionsCousubs.views.find(v => v.id == viewCousubs),
-                            viewTract: versionsTract.views.find(v => v.id == viewTract),
-                        })}>
+                    CallServer({rtPfx, source, history, etlContextId, userId})}>
                 Add New Source
             </button>
         </div>
