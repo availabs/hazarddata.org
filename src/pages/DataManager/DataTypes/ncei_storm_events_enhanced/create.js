@@ -5,116 +5,30 @@ import {selectPgEnv, selectUserId} from "../../store";
 import {useHistory} from "react-router-dom";
 import get from "lodash.get";
 
-const formatDate = (dateString) => {
-    const options = {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false}
-    return new Date(dateString).toLocaleDateString(undefined, options)
-}
+import {checkApiResponse, formatDate, newETL, getSrcViews, createNewDataSource, submitViewMeta} from "../utils/utils";
 
-async function checkApiResponse(res) {
-    if (!res.ok) {
-        let errMsg = res.statusText;
-        try {
-            const { message } = await res.json();
-            errMsg = message;
-        } catch (err) {
-            console.error(err);
-        }
-
-        throw new Error(errMsg);
-    }
-}
-
-const createNewDataSource = async (rtPfx, source) => {
-    const { name: sourceName, display_name: sourceDisplayName } = source;
-    const res = await fetch(`${rtPfx}/metadata/createNewDataSource`, {
-        method: "POST",
-        body: JSON.stringify({
-            name: sourceName,
-            display_name: sourceDisplayName,
-            type: "ncei_storm_vents_enhanced",
-        }),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    await checkApiResponse(res);
-
-    const newSrcMeta = await res.json();
-
-    return newSrcMeta;
-};
-
-async function submitViewMeta({rtPfx, etlContextId, userId, sourceName}) {
-    const url = new URL(`${rtPfx}/staged-geospatial-dataset/submitViewMeta`);
-    url.searchParams.append("etl_context_id", etlContextId);
-    url.searchParams.append("user_id", userId);
-
-    const viewMetadata = {
-        data_source_name: sourceName,
-        version: 1,
-
-    };
-
-    const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(viewMetadata),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    await checkApiResponse(res);
-
-    const viewMetaRes = await res.json();
-
-    console.log(viewMetaRes);
-}
-
-const newETL = async ({rtPfx, setEtlContextId}) => {
-    console.log('etlcalled')
-    const newEtlCtxRes = await fetch(`${rtPfx}/new-etl-context-id`);
-    await checkApiResponse(newEtlCtxRes);
-
-    const _etlCtxId = +(await newEtlCtxRes.text());
-    setEtlContextId(_etlCtxId);
-    return _etlCtxId
-}
-
-const getSrcViews = async ({rtPfx, setVersions, etlContextId, type}) => {
-    if(!etlContextId) return {}
-    const url = new URL(
-        `${rtPfx}/staged-geospatial-dataset/versionSelectorUtils`
-    );
-    url.searchParams.append("etl_context_id", etlContextId);
-    url.searchParams.append("type", type);
-
-    const list = await fetch(url);
-
-    await checkApiResponse(list);
-
-    const {
-        sources, views
-    } = await list.json();
-    setVersions({sources, views})
-
-    return {sources, views}
-
-
-}
 const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewNCEI={},viewZTC={}, viewCousubs={}, viewTract={}}) => {
     const { name: sourceName, display_name: sourceDisplayName } = source;
 
-    const src = await createNewDataSource(rtPfx, source);
-    console.log('calling server?', etlContextId)
-    await submitViewMeta({rtPfx, etlContextId, userId, sourceName})
+    const src = await createNewDataSource(rtPfx, source, "ncei_storm_events_enhanced");
+    console.log('calling server?', etlContextId, src)
+    const view = await submitViewMeta({
+        rtPfx, etlContextId, userId, sourceName, src,
+        metadata: {
+            zone_to_county_version: viewZTC.view_id,
+            cousubs_version: viewCousubs.view_id,
+            tract_version: viewTract.view_id,
+            ncei_version: viewNCEI.view_id
+        }
+    })
 
     const url = new URL(
         `${rtPfx}/staged-geospatial-dataset/enhanceNCEI`
     );
     url.searchParams.append("etl_context_id", etlContextId);
     url.searchParams.append("table_name", 'details_enhanced');
-    url.searchParams.append("src_id", src.id);
+    url.searchParams.append("src_id", src.source_id);
+    url.searchParams.append("view_id", view.view_id);
     url.searchParams.append("ncei_schema", viewNCEI.table_schema);
     url.searchParams.append("ncei_table", viewNCEI.table_name);
     url.searchParams.append("tract_schema", viewTract.table_schema);
@@ -129,7 +43,7 @@ const CallServer = async ({rtPfx, source, history, etlContextId, userId, viewNCE
     await checkApiResponse(stgLyrDataRes);
 
     console.log('res', await stgLyrDataRes.json())
-    history.push(`/datasources/source/${src.id}`);
+    history.push(`/datasources/source/${src.source_id}`);
 }
 
 const RenderVersions = ({value, setValue, versions, type}) => {
@@ -149,10 +63,10 @@ const RenderVersions = ({value, setValue, versions, type}) => {
                             {versions.views
                                 .map(v =>
                                     <option
-                                        key={v.id}
-                                        value={v.id} className='p-2'>
-                                        {get(versions.sources.find(s => s.id === v.source_id), 'display_name')}
-                                        {` (${v.id} ${formatDate(v.last_updated)})`}
+                                        key={v.view_id}
+                                        value={v.view_id} className='p-2'>
+                                        {get(versions.sources.find(s => s.source_id === v.source_id), 'display_name')}
+                                        {` (${v.view_id} ${formatDate(v.last_updated)})`}
                                     </option>)
                             }
                         </select>
@@ -214,10 +128,10 @@ const Create = ({ source }) => {
                 onClick={() =>
                     CallServer(
                         {rtPfx, source, history, etlContextId, userId,
-                            viewNCEI: versionsNCEI.views.find(v => v.id == viewNCEI),
-                            viewZTC: versionsZTC.views.find(v => v.id == viewZTC),
-                            viewCousubs: versionsCousubs.views.find(v => v.id == viewCousubs),
-                            viewTract: versionsTract.views.find(v => v.id == viewTract),
+                            viewNCEI: versionsNCEI.views.find(v => v.view_id == viewNCEI),
+                            viewZTC: versionsZTC.views.find(v => v.view_id == viewZTC),
+                            viewCousubs: versionsCousubs.views.find(v => v.view_id == viewCousubs),
+                            viewTract: versionsTract.views.find(v => v.view_id == viewTract),
                         })}>
                 Add New Source
             </button>

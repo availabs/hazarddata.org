@@ -3,96 +3,31 @@ import {DAMA_HOST} from "../../../../config";
 import {useSelector} from "react-redux";
 import {selectPgEnv, selectUserId} from "../../store";
 import {useHistory} from "react-router-dom";
+import {checkApiResponse, formatDate, newETL, getSrcViews, createNewDataSource, submitViewMeta} from "../utils/utils";
 
-async function checkApiResponse(res) {
-    if (!res.ok) {
-        let errMsg = res.statusText;
-        try {
-            const { message } = await res.json();
-            errMsg = message;
-        } catch (err) {
-            console.error(err);
-        }
 
-        throw new Error(errMsg);
-    }
-}
-
-const createNewDataSource = async (rtPfx, source, tigerTable) => {
-    const { name: sourceName, display_name: sourceDisplayName } = source;
-    const res = await fetch(`${rtPfx}/metadata/createNewDataSource`, {
-        method: "POST",
-        body: JSON.stringify({
-            name: sourceName,
-            display_name: sourceDisplayName,
-            type: `tl_${tigerTable.toLowerCase()}`,
-        }),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    await checkApiResponse(res);
-
-    const newSrcMeta = await res.json();
-
-    return newSrcMeta;
-};
-
-async function submitViewMeta({rtPfx, _etlCtxId, userId, sourceName}) {
-    const url = new URL(`${rtPfx}/staged-geospatial-dataset/submitViewMeta`);
-    url.searchParams.append("etl_context_id", _etlCtxId);
-    url.searchParams.append("user_id", userId);
-
-    const viewMetadata = {
-        data_source_name: sourceName,
-        version: 1,
-    };
-
-    const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(viewMetadata),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    await checkApiResponse(res);
-
-    const viewMetaRes = await res.json();
-
-    console.log('view meta', viewMetaRes);
-}
-
-const CallServer = async ({rtPfx, source, history, setEtlContextId, userId, tigerTable}) => {
-
+const CallServer = async ({rtPfx, source, history, etlContextId, userId, tigerTable}) => {
     const { name: sourceName, display_name: sourceDisplayName } = source;
 
-    const newEtlCtxRes = await fetch(`${rtPfx}/new-etl-context-id`);
-    await checkApiResponse(newEtlCtxRes);
-
-    const _etlCtxId = +(await newEtlCtxRes.text());
-    console.log('??', _etlCtxId)
-    setEtlContextId(_etlCtxId);
-
-    const src = await createNewDataSource(rtPfx, source, tigerTable);
+    const src = await createNewDataSource(rtPfx, source, `tl_${tigerTable.toLowerCase()}`);
     console.log('src?', src)
-    await submitViewMeta({rtPfx, _etlCtxId, userId, sourceName})
+    const view = await submitViewMeta({rtPfx, etlContextId, userId, sourceName, src})
 
     const url = new URL(
         `${rtPfx}/staged-geospatial-dataset/tigerDownloadAction`
     );
-    url.searchParams.append("etl_context_id", _etlCtxId);
+    url.searchParams.append("etl_context_id", etlContextId);
     url.searchParams.append("table", tigerTable);
     // url.searchParams.append("table_name", 'tl_cousubs');
-    url.searchParams.append("src_id", src.id);
+    url.searchParams.append("src_id", src.source_id);
+    url.searchParams.append("view_id", view.view_id);
 
     const stgLyrDataRes = await fetch(url);
 
     await checkApiResponse(stgLyrDataRes);
 
     console.log('res', stgLyrDataRes.body)
-    history.push(`/datasources/source/${src.id}`);
+    history.push(`/datasources/source/${src.source_id}`);
 }
 
 const RenderTigerTables= ({value, setValue, domain}) => {
@@ -126,6 +61,7 @@ const RenderTigerTables= ({value, setValue, domain}) => {
         </div>
     )
 }
+
 const Create = ({ source }) => {
     const history = useHistory();
     const [etlContextId, setEtlContextId] = React.useState();
@@ -136,13 +72,21 @@ const Create = ({ source }) => {
 
     const rtPfx = `${DAMA_HOST}/dama-admin/${pgEnv}`;
 
+    React.useEffect(() => {
+        async function fetchData() {
+            const etl = await newETL({rtPfx, setEtlContextId});
+            setEtlContextId(etl);
+        }
+        fetchData();
+    }, [])
+
     return (
         <div className='w-full'>
             {RenderTigerTables({value: tigerTable, setValue: setTigerTable, domain: ['COUSUB', 'TRACT']})}
             <button
                 onClick={() =>
                     CallServer({
-                        rtPfx, source, history, etlContextId, setEtlContextId, userId, tigerTable})}
+                        rtPfx, source, history, etlContextId, userId, tigerTable})}
                 disabled={!tigerTable}
             >
                 Add New Source
