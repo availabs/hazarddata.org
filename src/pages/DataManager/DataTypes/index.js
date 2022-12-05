@@ -6,6 +6,7 @@ import ncei_storm_events from "./ncei_storm_events";
 import ncei_storm_events_enhanced from "./ncei_storm_events_enhanced";
 import zone_to_county from "./zone_to_county";
 import tiger_2017 from "./tiger_2017";
+import open_fema_data from "./open_fema_data"
 
 const DataTypes = {
   freight_atlas_shapefile,
@@ -14,7 +15,8 @@ const DataTypes = {
   ncei_storm_events,
   ncei_storm_events_enhanced,
   zone_to_county,
-  tiger_2017
+  tiger_2017,
+  open_fema_data
 };
 
 export { DataTypes, Pages };
