@@ -7,26 +7,26 @@ import {checkApiResponse, formatDate, newETL, getSrcViews, createNewDataSource, 
 import get from "lodash.get";
 
 const CallServer = async ({rtPfx, source, history, etlContextId, userId, table}) => {
-    // const { name: sourceName, display_name: sourceDisplayName } = source;
+    const { name: sourceName, display_name: sourceDisplayName } = source;
 
-    // const src = await createNewDataSource(rtPfx, source, table);
-    // console.log('src?', src)
-    // const view = await submitViewMeta({rtPfx, etlContextId, userId, sourceName, src})
+    const src = await createNewDataSource(rtPfx, source, table);
+    console.log('src?', src)
+    const view = await submitViewMeta({rtPfx, etlContextId, userId, sourceName, src})
 
     const url = new URL(
         `${rtPfx}/staged-geospatial-dataset/usdaLoader`
     );
     url.searchParams.append("etl_context_id", etlContextId);
     url.searchParams.append("table_name", table);
-    // url.searchParams.append("src_id", src.source_id);
-    // url.searchParams.append("view_id", view.view_id);
+    url.searchParams.append("src_id", src.source_id);
+    url.searchParams.append("view_id", view.view_id);
 
     const stgLyrDataRes = await fetch(url);
 
     await checkApiResponse(stgLyrDataRes);
 
     console.log('res', stgLyrDataRes.body)
-    // history.push(`/datasources/source/${src.source_id}`);
+    history.push(`/datasources/source/${src.source_id}`);
 }
 
 const Create = ({ source }) => {
@@ -49,7 +49,7 @@ const Create = ({ source }) => {
     return (
         <div className='w-full'>
             <button onClick={() => CallServer({
-                rtPfx, source, history, etlContextId, userId, table: 'usda'
+                rtPfx, source, history, etlContextId, userId, table: 'usda_crop_insurance_cause_of_loss'
             })}> Add New Source</button>
         </div>
     )
