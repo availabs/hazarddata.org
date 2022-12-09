@@ -8,6 +8,7 @@ import zone_to_county from "./zone_to_county";
 import tiger_2017 from "./tiger_2017";
 import open_fema_data from "./open_fema_data"
 import usda from "./usda"
+import sba from "./sba"
 
 const DataTypes = {
   freight_atlas_shapefile,
@@ -18,7 +19,8 @@ const DataTypes = {
   zone_to_county,
   tiger_2017,
   open_fema_data,
-  usda
+  usda,
+  sba
 };
 
 export { DataTypes, Pages };
