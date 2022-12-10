@@ -17,7 +17,7 @@ const datasets = [
     // "fema_web_declaration_areas_v1",
     "fema_web_disaster_declarations_v1",
     "fema_web_disaster_summaries_v1",
-    // "fima_nfip_claims_v1",
+    "fima_nfip_claims_v1",
     // "fima_nfip_policies_v1",
     // "hazard_mitigation_assistance_mitigated_properties_v1",
     "hazard_mitigation_assistance_mitigated_properties_v2",
