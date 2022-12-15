@@ -9,6 +9,7 @@ import tiger_2017 from "./tiger_2017";
 import open_fema_data from "./open_fema_data"
 import usda from "./usda"
 import sba from "./sba"
+import nri from "./nri"
 
 const DataTypes = {
   freight_atlas_shapefile,
@@ -20,7 +21,8 @@ const DataTypes = {
   tiger_2017,
   open_fema_data,
   usda,
-  sba
+  sba,
+  nri
 };
 
 export { DataTypes, Pages };
