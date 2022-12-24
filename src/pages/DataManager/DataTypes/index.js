@@ -10,6 +10,7 @@ import open_fema_data from "./open_fema_data"
 import usda from "./usda"
 import sba from "./sba"
 import nri from "./nri"
+import per_basis_swd from "./per_basis_swd"
 
 const DataTypes = {
   freight_atlas_shapefile,
@@ -22,7 +23,8 @@ const DataTypes = {
   open_fema_data,
   usda,
   sba,
-  nri
+  nri,
+  per_basis_swd
 };
 
 export { DataTypes, Pages };
