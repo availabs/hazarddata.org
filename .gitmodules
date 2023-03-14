@@ -9,4 +9,4 @@
 	url = git@github.com:availabs/avl-graph.git
 [submodule "src/pages/DataManager"]
 	path = src/pages/DataManager
-	url = git@github.com:availabs/DataManagerClient.git
+	url = https://github.com/availabs/DataManagerClient
