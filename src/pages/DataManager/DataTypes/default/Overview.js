@@ -4,6 +4,8 @@ import get from 'lodash.get'
 import { SourceAttributes } from 'pages/DataManager/components/attributes'
 import { useSelector } from "react-redux";
 import { selectPgEnv } from "pages/DataManager/store"
+import Metadata from './Metadata'
+//import Versions from './Versions'
 
 const Edit = ({startValue, attr, sourceId, cancel=()=>{}}) => {
   const { falcor } = useFalcor()
@@ -50,18 +52,19 @@ const Edit = ({startValue, attr, sourceId, cancel=()=>{}}) => {
   )
 }
 
-const OverviewEdit = withAuth(({source, views, user}) => {
+const OverviewEdit = withAuth(({source, views, user, baseUrl='/datasources'}) => {
   const [editing, setEditing] = React.useState(null)
   
   return (
     <div className="overflow-hidden">
+      
       <div className="pl-4 py-6 hover:py-6 sm:pl-6 flex justify-between group">
         <div className="flex-1 mt-1 max-w-2xl text-sm text-gray-500">
           {editing === 'description' ? 
             <Edit 
               startValue={get(source,'description', '')}
               attr={'description'}
-              sourceId={source.id}
+              sourceId={source.source_id}
               cancel={() => setEditing(null)}/> : 
             get(source,'description', false) || 'No Description'}
         </div>
@@ -73,7 +76,7 @@ const OverviewEdit = withAuth(({source, views, user}) => {
       <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
         <dl className="sm:divide-y sm:divide-gray-200">
           {Object.keys(SourceAttributes)
-            .filter(d => !['id','metadata','description', 'statistics', 'category'].includes(d))
+            .filter(d => !['source_id','metadata','description', 'statistics', 'category'].includes(d))
             .map((attr,i) => {
               let val = typeof source[attr] === 'object' ? JSON.stringify(source[attr]) : source[attr]
               return (
@@ -86,7 +89,7 @@ const OverviewEdit = withAuth(({source, views, user}) => {
                           <Edit 
                             startValue={val} 
                             attr={attr}
-                            sourceId={source.id} 
+                            sourceId={source.source_id}
                             cancel={() => setEditing(null)}
                           />
                         </div> :  
@@ -102,7 +105,7 @@ const OverviewEdit = withAuth(({source, views, user}) => {
               )
             })
           }
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          {/*<div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Versions</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
               <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
@@ -115,8 +118,20 @@ const OverviewEdit = withAuth(({source, views, user}) => {
                 </select>
               </ul>
             </dd>
-          </div>
+          </div>*/}
         </dl>
+        {/*<div className='py-10 px-2'>
+          <div className='text-gray-500 py-8 px-5'>Versions</div>
+          <div className=''>
+            <Versions source={source} view={views} baseUrl={baseUrl}/>
+          </div>
+        </div>*/}
+        <div className='py-10 px-2'>
+          <div className='text-gray-500 py-8 px-5'>Metadata</div>
+          <div className=''>
+            <Metadata source={source} />
+          </div>
+        </div>
       </div>
     </div>
   )

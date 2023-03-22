@@ -4,7 +4,7 @@ import get from "lodash.get";
 
 const sliceName = "data_manager";
 
-const defaultPgEnv = "dama_dev_1";
+const defaultPgEnv = "npmrds";
 
 const lclStoKeys = {
   pgEnv: `redux.${sliceName}.pgEnv`,
@@ -29,7 +29,6 @@ export const datamanagerSlice = createSlice({
 export const {
   actions: { setPgEnv },
 } = datamanagerSlice;
-
 
 export const selectIsPwrUsr = (state) => {
   const { user } = state;

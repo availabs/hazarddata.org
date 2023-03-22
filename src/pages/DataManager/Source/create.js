@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from "react-redux";
 
 import { /*useFalcor,*//*TopNav,*/ Input /*withAuth, Input, Button*/ } from 'modules/avl-components/src'
@@ -7,60 +7,86 @@ import get from 'lodash.get'
 // import { useParams } from 'react-router-dom'
 import { DataTypes } from '../DataTypes'
 
-import SourcesLayout, {DataManagerHeader}  from '../components/SourcesLayout'
+import SourcesLayout from '../components/SourcesLayout'
 
 import {SourceAttributes, /*ViewAttributes, getAttributes*/} from 'pages/DataManager/components/attributes'
     
-import { selectIsPwrUsr } from "pages/DataManager/store";
+import { selectPgEnv, selectIsPwrUsr } from "pages/DataManager/store";
 
-const Source = () => {
+const SourceCreate = ({baseUrl}) => {
 // prettier canary
   //const {falcor, falcorCache} = useFalcor()
   const [ source, setSource ] = useState( 
     Object.keys(SourceAttributes)
-      .filter(d => !['id', 'metadata','statistics'].includes(d))
+      .filter(d => !['source_id', 'metadata','statistics'].includes(d))
       .reduce((out,current) => {
         out[current] = ''
         return out
       }, {})
   )
 
+  const [dataTypes, setDataTypes] = useState(null);
+
+  const pgEnv = useSelector(selectPgEnv);
   const isPwrUsr = useSelector(selectIsPwrUsr);
 
-  const dataTypes = isPwrUsr
-    ? DataTypes
-    : Object.keys(DataTypes).reduce((acc, dType) => {
-        const component = DataTypes[dType];
-        if (component.pwrUsrOnly) {
-          return acc;
-        }
+  useEffect(() => {
+    (async () => {
+      const filteredDataTypeKeys = (
+        await Promise.all(
+          Object.keys(DataTypes).map(async (dt) => {
+            if (dt.pwrUsrOnly && !isPwrUsr) {
+              return null;
+            }
 
-        acc[dType] = component;
+            if (DataTypes[dt].getIsAlreadyCreated) {
+              const exclude = await DataTypes[dt].getIsAlreadyCreated(pgEnv);
 
+              if (exclude) {
+                return null;
+              }
+            }
+
+            return dt;
+          })
+        )
+      ).filter(Boolean);
+
+      const filteredDataTypes = filteredDataTypeKeys.reduce((acc, dt) => {
+        acc[dt] = DataTypes[dt];
         return acc;
       }, {});
-
+      console.log('testing',filteredDataTypes)
+      setDataTypes(filteredDataTypes);
+    })();
+  }, [pgEnv, isPwrUsr]);
 
   const CreateComp = useMemo(() => get(dataTypes, `[${source.type}].sourceCreate.component`, () => <div />)
     ,[dataTypes, source.type])
   
   // console.log('new source', CreateComp)
+
+  if (dataTypes === null) {
+    return <div>Requesting data types statuses</div>;
+  }
+
+  // console.log('new source', CreateComp)
   
   return (
-    <div className='max-w-6xl mx-auto'>
-      <div className='fixed right-0 top-[170px] w-64 '>
+    <div>
+      {/*<div className='fixed right-0 top-[170px] w-64 '>
           <pre>
             {JSON.stringify(source,null,3)}
           </pre>
-      </div>
-      <SourcesLayout>
+      </div>*/}
+      <SourcesLayout baseUrl={baseUrl}>
         
       <div className='p-4 font-medium'> Create New Source </div>
       
       <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
         <dl className="sm:divide-y sm:divide-gray-200">
           {Object.keys(SourceAttributes)
-            .filter(d => !['id','metadata','description', 'type','statistics', 'category', 'update_interval', 'categories'].includes(d))
+            .filter(d => !['source_id','metadata','description', 'type','statistics', 'category', 'update_interval', 'categories', 'display_name'].includes(d))
             .map((attr,i) => {
               // let val = typeof source[attr] === 'object' ? JSON.stringify(source[attr]) : source[attr]
               return (
@@ -114,7 +140,7 @@ const Source = () => {
             </div>
           </div>
         </dl>
-        <CreateComp source={source} />
+        <CreateComp source={source} baseUrl={baseUrl}/>
       </div>
    
   </SourcesLayout>
@@ -124,18 +150,6 @@ const Source = () => {
 
 
 
-const config = [{
-  name:'Create Source',
-  path: "/datasources/create/source",
-  exact: true,
-  auth: true,
-  mainNav: false,
-  title: <DataManagerHeader />,
-  sideNav: {
-    color: 'dark',
-    size: 'micro'
-  },
-  component: Source
-}]
 
-export default config;
+
+export default SourceCreate;

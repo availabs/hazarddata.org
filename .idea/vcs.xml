@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/modules/avl-components" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/modules/avl-graph" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/modules/avl-map" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/pages/DataManager" vcs="Git" />
+  </component>
+</project>

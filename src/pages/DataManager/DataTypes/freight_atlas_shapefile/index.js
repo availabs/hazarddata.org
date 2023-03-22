@@ -4,15 +4,15 @@ import get from 'lodash.get'
 // import { useParams } from 'react-router-dom'
 import FreightAtlasLayer from './FreightAtlasLayer'
 import { AvlMap } from "modules/avl-map/src"
+import { SymbologyControls } from 'pages/DataManager/components/SymbologyControls'
 
 import Create from './create'
 import config from "config.json"
 
 // import { getAttributes } from 'pages/DataManager/components/attributes'
     
+
 const Map = ({layers}) => {
-    
-    console.log('layers', layers)
     
     const mapOptions =  {
         zoom: 6.2,
@@ -34,7 +34,9 @@ const Map = ({layers}) => {
  
     const map_layers = useMemo(() => {
       return layers.map(l => FreightAtlasLayer(l))
-    },[])
+    },[layers])
+
+    console.log('map_layers',map_layers)
     
     return (
         
@@ -49,8 +51,6 @@ const Map = ({layers}) => {
        
     )
 }
-
-
 
 const Edit = ({startValue, attr, viewId, parentData, cancel=()=>{}}) => {
   const { falcor } = useFalcor()
@@ -69,13 +69,14 @@ const Edit = ({startValue, attr, viewId, parentData, cancel=()=>{}}) => {
   },[value])
 
   const save = async (attr, value) => {
+    console.log('click save', viewId, attr, value)
     if(viewId) {
-      try{
+      //try{
         let update = JSON.parse(value)
-        let val = parentData
+        let val = parentData || {tiles:{}}
         val.tiles[attr] = update
-        // console.log('testing',JSON.stringify(val), val)
-        await falcor.set({
+        console.log('testing',JSON.stringify(val), val)
+        let response = await falcor.set({
             paths: [
               ['datamanager','views','byId',viewId,'attributes', 'metadata' ]
             ],
@@ -91,11 +92,11 @@ const Edit = ({startValue, attr, viewId, parentData, cancel=()=>{}}) => {
               }
             }
         })
-        // console.log('set run', response)
+        console.log('set run', response)
         cancel()
-      } catch (error) {
-        // console.log('error stuff',error,value, parentData);
-      }
+      // } catch (error) {
+      //   console.log('error stuff',error,value, parentData);
+      // }
     }
   }
 
@@ -122,10 +123,12 @@ const Edit = ({startValue, attr, viewId, parentData, cancel=()=>{}}) => {
 
 const MapPage = ({source,views, user}) => {
   // const { sourceId } = useParams()
-  console.log('user auth', user)
+  const { falcor } = useFalcor()
+  // console.log('user auth', user)
   const [ activeView /*, setActiveView*/ ] = useState(0)
   const [ mapData /*, setMapData*/ ] = useState(get(views,`[${activeView}].metadata.tiles`,{}))
   const [ editing, setEditing ] = React.useState(null)
+  const viewId = React.useMemo(() => get(views,`[${activeView}].id`,null), [views,activeView])
   const layer = React.useMemo(() => {
       return {
             name: source.name,
@@ -139,6 +142,36 @@ const MapPage = ({source,views, user}) => {
   },[source, views, mapData, activeView])
 
   // console.log('testing', mapData, activeView)
+  const save = async (attr, value) => {
+    console.log('click save', attr, value)
+    if(viewId) {
+      try{
+        let update = value
+        let val = get(views,`[${activeView}].metadata`,{tiles:{}}) || {tiles:{}}
+        val.tiles[attr] = update
+        let response = await falcor.set({
+            paths: [
+              ['datamanager','views','byId',viewId,'attributes', 'metadata' ]
+            ],
+            jsonGraph: {
+              datamanager:{
+                views: {
+                  byId:{
+                    [viewId] : {
+                        attributes : { 'metadata': JSON.stringify(val)}
+                    }
+                  }
+                }
+              }
+            }
+        })
+        console.log('set run', response)
+        // cancel()
+      } catch (error) {
+        // console.log('error stuff',error,value, parentData);
+      }
+    }
+  }
 
   return (
     <div> 
@@ -149,6 +182,10 @@ const MapPage = ({source,views, user}) => {
       </div>
       {user.authLevel >= 5 ? 
       <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+        <SymbologyControls 
+          layer={layer} 
+          onChange={(v) => save('symbology',v)}
+        />
         <dl className="sm:divide-y sm:divide-gray-200">
           {['sources','layers','symbology']
             .map((attr,i) => {
@@ -163,8 +200,8 @@ const MapPage = ({source,views, user}) => {
                           <Edit 
                             startValue={val} 
                             attr={attr}
-                            viewId={get(views,`[${activeView}].id`,null)}
-                            parentData={get(views,`[${activeView}].metadata`,{})}
+                            viewId={get(views,`[${activeView}].view_id`,null)}
+                            parentData={get(views,`[${activeView}].metadata`,{tiles:{}})}
                             cancel={() => setEditing(null)}
                           />
                         </div> :  
