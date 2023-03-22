@@ -1,20 +1,15 @@
 [submodule "src/modules/avl-components"]
 	path = src/modules/avl-components
 	url = git@github.com:availabs/avl-components.git
-	branch = master
 [submodule "src/modules/avl-map"]
 	path = src/modules/avl-map
 	url = git@github.com:availabs/avl-map.git
-	branch = master
 [submodule "src/modules/avl-graph"]
 	path = src/modules/avl-graph
 	url = git@github.com:availabs/avl-graph.git
-	branch = main
 [submodule "src/pages/DataManager"]
 	path = src/pages/DataManager
-	url = git@github.com:availabs/DataManagerClient.git
-	branch = master
-
+	url = https://github.com/availabs/DataManagerClient
 [submodule "src/modules/avl-maplibre"]
 	path = src/modules/avl-maplibre
 	url = git@github.com:availabs/avl-maplibre.git
