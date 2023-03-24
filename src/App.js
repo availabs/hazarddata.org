@@ -1,5 +1,5 @@
 import React,  {useMemo} from 'react';
-import { BrowserRouter, Switch } from 'react-router-dom';
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import ScrollToTop from 'utils/ScrollToTop'
 import DefaultRoutes from 'Routes';
@@ -8,11 +8,13 @@ import get from 'lodash.get'
 import {/*getDomain,*/getSubdomain} from 'utils'
 
 import {
+  ComponentFactory,
   DefaultLayout,
   Messages
-} from "modules/avl-components/src"
+} from "modules/avl-components/src";
 
 import transportNY from 'sites/www'
+import Layouts from "./modules/avl-components/src/components/Layouts";
 
 
 const Sites = {
@@ -28,26 +30,51 @@ const App = (props) => {
       return get(Sites, SUBDOMAIN, Sites['hazardata'])
   },[SUBDOMAIN])
 
-  const Routes =  useMemo(() => {
+  const routes =  useMemo(() => {
     return [...site.Routes, ...DefaultRoutes ]
   }, [site])
 
+  console.log('routes', routes);
+
+  // const route = routes[0];
+  // const LayoutWrapper = (props) => {
+  //   const
+  //     Layout = Layouts.Fixed;
+  //   return <Layout { ...route.layoutSettings } { ...route } > <Outlet /> </Layout>
+  // }
+
+  // console.log(
+  //   <DefaultLayout
+  //     site={site.title}
+  //     layout={Layout}
+  //     key={ 0 }
+  //     { ...route }
+  //     { ...props }
+  //     menus={ route.mainNav }/>
+  // )
   return (
     <BrowserRouter basename={process.env.REACT_APP_PUBLIC_URL}>
       <ScrollToTop />
-      {/*<div>{SUBDOMAIN} {site.title} {PROJECT_HOST}</div>*/}
-      <Switch>
-        { Routes.map((route, i) =>
-            <DefaultLayout
-              site={site.title}
-              layout={Layout}
-              key={ i }
-              { ...route }
-              { ...props }
-              menus={ Routes.filter(r => r.mainNav) }/>
-          )
+      <Routes>
+        {
+          routes.map((route, i) => {
+            console.log('path', route.path)
+            const LayoutWrapper = (props) => {
+              const
+                Layout = Layouts.Fixed;
+              return <Layout { ...route.layoutSettings } { ...route } > <Outlet /> </Layout>
+            }
+            return (
+              <Route key={i} path={ route.path } exact={ route.exact } element={<LayoutWrapper {...route}/>}>
+                <Route path={ route.path } exact={ route.exact }  element={<ComponentFactory config={ route.component }/>}/>
+              </Route>
+            )
+          })
         }
-      </Switch>
+        {/*<Route element={<LayoutWrapper {...route}/>}>*/}
+        {/*  <Route path={ route.path } exact={ route.exact } element={<ComponentFactory config={ route.component }/>}/>*/}
+        {/*</Route>*/}
+      </Routes>
       <Messages />
     </BrowserRouter>
   );
