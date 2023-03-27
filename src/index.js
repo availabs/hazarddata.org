@@ -27,7 +27,7 @@ import {
   Components as AmsComponents,
   Wrappers as AmsWrappers,
   enableAuth
-} from "@availabs/ams"
+} from "modules/ams/src"
 
 import 'index.css';
 
