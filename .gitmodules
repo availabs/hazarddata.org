@@ -10,9 +10,6 @@
 [submodule "src/modules/avl-maplibre"]
 	path = src/modules/avl-maplibre
 	url = git@github.com:availabs/avl-maplibre.git
-[submodule "src/pages/DataManager"]
-	path = src/pages/DataManager
-	url = git@github.com:availabs/DataManagerClient.git
 [submodule "src/modules/ams"]
 	path = src/modules/ams
 	url = git@github.com:availabs/ams.git
