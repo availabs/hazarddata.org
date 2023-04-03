@@ -16,3 +16,6 @@
 [submodule "src/modules/vite-dmstest"]
 	path = src/modules/vite-dmstest
 	url = git@github.com:availabs/vite-dmstest.git
+[submodule "src/pages/DataManager"]
+	path = src/pages/DataManager
+	url = git@github.com:availabs/DataManagerClient.git
