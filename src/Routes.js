@@ -5,7 +5,7 @@ import DataManager from "pages/DataManager"
 import Documentation from "pages/Documentation"
 
 const Routes = [
-  Auth,
+    ...Auth,
   ...DataManager(),
   ...Documentation,
   NoMatch

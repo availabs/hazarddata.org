@@ -1,54 +1,66 @@
 import Login from "./components/login"
 
-const AuthConfig = {
+const LoginConfig = {
   type: "ams-manager",
   props: {
     showHeaders: false,
-    className: 'h-full'
+    className: 'h-full',
+    params: {
+      action: '/auth/login'
+    },
   },
   wrappers: [
     "ams-redux",
-    "ams-router",
+    // "ams-router",
   ],
   children: [
     { type: Login,
-      wrappers: ["ams-login"]
+      wrappers: ["ams-login"],
+      props: {amsAction: '/auth/login'}
     },
-    // { type: "ams-reset-password" },
-    // { type: "ams-logout",
-    // // @props.redirectTo
-    // // Optional prop. Defaults to "/".
-    // // Redirects user to URL after logging out.
-    // // props: { redirectTo: "/" }
-    // },
-    //
-    // { type: "ams-signup",
-    // // @props.addToGroup
-    // // Optional prop. Defaults to false.
-    // // Adds user to group (must have auth level 0 in all projects) instead of creating a request that must be accepted by admin.
-    //   props: { addToGroup: "123" }
-    // },
-    // { type: "ams-profile" },
-    // { type: "ams-verify-request" }, // This is only required when addToGroup prop is included with ams-signup
-    // { type: "ams-verify-email" }, // This is only required when addToGroup prop is not included with ams-signup
-    // { type: "ams-set-password" }, // This is only required when addToGroup prop is not included with ams-signup
-    // { type: "ams-accept-invite" },
-    //
-    // { type: "ams-project-management",
-    // // @props.authLevel
-    // // Optional prop. This prop can be applied to any AMS child.
-    // // If set, users must have equal or higher authLevel to view this page.
-    //   props: { authLevel: 5 }
-    // }
+    { type: "ams-reset-password" },
   ]
 }
 
-const AuthSystemConfig = {
-  path: "auth/:action/*",
+const LogoutConfig = {
+  type: "ams-manager",
+  props: {
+    showHeaders: false,
+    className: 'h-full',
+    params: {
+      action: '/auth/logout'
+    },
+  },
+  wrappers: [
+    "ams-redux",
+    // "ams-router",
+  ],
+  children: [
+    { type: "ams-logout",
+      props: {amsAction: '/auth/logout'}
+    // @props.redirectTo
+    // Optional prop. Defaults to "/".
+    // Redirects user to URL after logging out.
+    // props: { redirectTo: "/" }
+    }
+  ]
+}
+
+const AuthSystemConfig = [{
+  path: "/auth/login",
   mainNav: false,
   sideNav: {
     size: 'none'
   },
-  component: AuthConfig
-}
+  component: LoginConfig
+},
+  {
+    path: "/auth/logout",
+    mainNav: false,
+    sideNav: {
+      size: 'none'
+    },
+    component: LogoutConfig
+  }
+  ]
 export default AuthSystemConfig
