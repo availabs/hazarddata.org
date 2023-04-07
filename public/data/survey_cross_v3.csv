@@ -60,7 +60,7 @@ Destination MCD |
 Destination Zip |
 1 if destination is in NYC |
 Destination MPO | 
-Destination County |
+Destination Index |
 Geo group 1 for destination |
 Geo group 2 for destination |
 Geo group 3 for destination |
@@ -70,7 +70,7 @@ Destination Type Code |
 Priority of Destination |
 Primary Tour Destination TAZ (NYMTC) |
 Primary Tour Destination Census Tract 2010 |
-Prime Destination County |
+Prime Destination Index |
 Primary Destination X Coord |
 Primary Destination Y Coord |
 Geo group 1 for Primary Destination |
@@ -124,7 +124,7 @@ X Longitude (in WGS 84) |
 Location Imputed by NYMTC/NJTPA |
 Location TAZ (NYMTC Provided) |
 Location Census Tract 2010 (NYMTC Provided) |
-County FIPS |",,,,1,1,1,,
+Index FIPS |",,,,1,1,1,,
 Trip Information,Tour/Day Information,RHTS,Trip-Level,General trip characteristics,Destination Location,RHTS,SUBT_AREA,Subtour Area Type,,,,,,,,,,,,,,,,,,,,,,"SUBT_TAZ |
 SUBT_TRACT |","subtour TAZ (NYMTC) |
 Subtour Census Tract 2010 |",,,,,1,,,
@@ -315,7 +315,7 @@ HTAZ |
 HMPO |","Home Address |
 Home Y Latitude (in WGS 84) |
 Home X Longitude (in WGS 84) |
-Home County |
+Home Index |
 Home State |
 Home City (TB) |
 Home City (Place Name) |
@@ -352,9 +352,9 @@ Urban area size where home address is located |
 Household in urban/rural area |
 MSA heavy rail status for household |",1,1,1,1,,,,,,,,,,
 Locations,Home,RHTS,Household-Level,Identifier,Home location,RHTS,HH1,Domain,,,,,,,,,,,,,,,,,,,,,,HH1,Domain,1,1,1,1,1,1,1,1
-Locations,Home,RHTS,Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUPS,County/Regional/Political Groups,,,,,,,,,,,,,,,,,,,,,,"GEO_GROUP1 |
+Locations,Home,RHTS,Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUPS,Index/Regional/Political Groups,,,,,,,,,,,,,,,,,,,,,,"GEO_GROUP1 |
 GEO_GROUP2 |
-GEO_GROUP3 |","County Group: Level 1 |
+GEO_GROUP3 |","Index Group: Level 1 |
 Regional Boundaries: Level 2 |
 Political Boundaries: Level 3 |",1,1,,1,,,,
 Locations,Home,RHTS,Trip-Level,Household Characteristics,Home location,RHTS,HNYC,1 if Home is in NYC,,,,,,,,,,,,,,,,,,,,,,HNYC,1 if Home is in NYC,,,,,1,1,1,1
@@ -696,7 +696,7 @@ Trip Information,Mode,NHTS,Trip-Level,Person characteristics,Leg-Travelers,NHTS,
 Trip Information,Mode,NHTS,Trip-Level,General trip characteristics,Leg-Travelers,NHTS,DRVR_FLG,Respondent drove on trip,,,,,,,,,,,,,,,,DRVR_FLG,Respondent drove on trip,,,,1,,,,,,,,,,
 Trip Information,Travelers,NHTS,Trip-Level,Identifier,Leg-Travelers,NHTS,WHODROVE,Person Identifier Who Drove on Trip,,,,,,,,,,,,,,,,WHODROVE,Person Identifier Who Drove on Trip,,,,1,,,,,,,,,,
 Survey ID/Flag,ID,NHTS,Person-Level,Identifier,Leg-Travelers,NHTS,WHOPROXY,Household Person Identifier Responsible for Trip Reporting,,,,,,,,,,,,,,,,WHOPROXY,Household Person Identifier Responsible for Trip Reporting,,1,,,,,,,,,,,,
-Trip Information,Stops,RHTS,Trip-Level,General trip characteristics,Location unspecified,RHTS,ADJ_COUNTY,Adjacent County flags,,,,,,,,,,,,,,,,,,,,,,ADJ_COUNTY,Adjacent County flags,,,,,1,1,1,1
+Trip Information,Stops,RHTS,Trip-Level,General trip characteristics,Location unspecified,RHTS,ADJ_COUNTY,Adjacent Index flags,,,,,,,,,,,,,,,,,,,,,,ADJ_COUNTY,Adjacent Index flags,,,,,1,1,1,1
 Trip Information,Tour/Day Information,In 3 Surveys,Day-Level,General day characteristics,Origin location,Smartphone Pilot,begin_day,Day begin location,begin_day,Day begin location,,,,,,1,,,,,,,,FRSTHM17,Travel day began at home location,,1,,,,,,,,,,,,
 Trip Information,Origin,Smartphone Pilot,Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_lat,Origin latitude,"o_lat |
 o_lon |
@@ -742,7 +742,7 @@ Origin MPO |
 Geo group 1 for origin |
 Geo group 2 for origin |
 Geo group 3 for origin |
-Origin County |",1,,,1,1,1,1,1
+Origin Index |",1,,,1,1,1,1,1
 Trip Information,Route/Path,Smartphone Pilot,Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,google_boarding_station,Google suggested boarding station,google_boarding_station,Google suggested boarding station,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
 Trip Information,Destination,NHTS,Trip-Level,General trip characteristics,Origin Location,NHTS,LOOP_TRIP,Trip origin and destination at identical location,,,,,,,,,,,,,,,,LOOP_TRIP,Trip origin and destination at identical location,,,,1,,,,,,,,,,
 Trip Information,Origin,NHTS,Trip-Level,General trip characteristics,Origin Location,NHTS,OBHTNRNT,Category of the percent of renter-occupied housing in the census block group of the trip origin's location,,,,,,,,,,,,,,,,"OBHTNRNT |
@@ -913,7 +913,7 @@ School X Longitude (in WGS 84) |
 School Y Latitude (in WGS 84) |
 School Location TAZ (NYMTC) |
 School Location Census Tract 2010 |
-School Location County |",,1,,1,,,,
+School Location Index |",,1,,1,,,,
 Locations,School,Smartphone Pilot,Person-Level,School-related,School location,Smartphone Pilot,student,Adult student status and location,student,Adult student status and location,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Locations,School,NYCDOT Mobility Survery,Person-Level,Survey-related,School location,NYCDOT Mobility Survery,missing_data,Missing data,,,,,,,,,"missing_school_location |
 missing_work_location |
@@ -969,7 +969,7 @@ Work Y Latitude (in WGS 84) |
 Work Location |
 Work X Longitude (in WGS 84) |
 Work Y Latitude (in WGS 84) |
-Work Location County |
+Work Location Index |
 Employer | Other, Employer |
 Name of Employer |
 Work Address |

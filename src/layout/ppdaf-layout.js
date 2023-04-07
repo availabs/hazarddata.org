@@ -82,6 +82,11 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								icon: "os-icon os-icon-home-10",
 							},
 							{
+								name: "County",
+								path: `/county/36001`,
+								icon: "os-icon os-icon-home-10",
+							},
+							{
 								name: "Data Sources",
 								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
 								icon: "os-icon os-icon-grid-squares2",
