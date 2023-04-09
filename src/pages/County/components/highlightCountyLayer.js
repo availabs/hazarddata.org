@@ -82,13 +82,12 @@ class EALChoroplethOptions extends LayerContainer {
 
     const dependencyPath = ['dama', this.props.pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       geomColName = 'geom',
-      geomColTransform = 'st_asgeojson(geom, 9, 1) as geom',
+      geomColTransform = ['st_asgeojson(geom, 9, 1) as geom'],
       geoIndices = {from: 0, to: 0},
-      geoPath    = ({source_id, view_id}) =>
-                        ['dama', this.props.pgEnv, 'view', view_id,
-                        'filters', JSON.stringify({geoid: [this.props.geoid.substring(0, 2)]}),
-                          JSON.stringify([geomColTransform]),
-                          'byIndex'
+      geoPath    = ({view_id}) =>
+                        ['dama', this.props.pgEnv, 'viewsbyId', view_id,
+                        'options', JSON.stringify({ filter: { geoid: [this.props.geoid.substring(0, 2)]}}),
+                          'databyIndex'
                         ];
 
 
@@ -97,10 +96,10 @@ class EALChoroplethOptions extends LayerContainer {
         const stateView = deps.find(d => d.type === 'tl_state');
 
         return falcor.get(
-          [...geoPath(stateView), geoIndices]
+          [...geoPath(stateView), geoIndices, geomColTransform]
         )
           .then(res => {
-            const geom = get(res, ["json", ...geoPath(stateView), 0, geomColName]);
+            const geom = get(res, ["json", ...geoPath(stateView), 0, geomColTransform]);
             if(geom){
               this.mapFocus =  get(JSON.parse(geom), 'bbox');
             }
@@ -114,14 +113,14 @@ class EALChoroplethOptions extends LayerContainer {
     if (this.mapFocus) {
       console.log('mf', this.mapFocus, [[this.mapFocus[0], this.mapFocus[1]], [this.mapFocus[2], this.mapFocus[3]]])
       try {
-        if(this.props.geoid.substring(0, 2) === '36'){
+        if(true || ['12', '36'].includes(this.props.geoid.substring(0, 2))){
           map.flyTo(
             {
               center:
                 [
-                  this.mapFocus[0], this.mapFocus[1]
+                  // this.mapFocus[0], this.mapFocus[1]
                   // // this.mapFocus[2], this.mapFocus[3]
-                  // (this.mapFocus[0] + this.mapFocus[2]) / 2, (this.mapFocus[1] + this.mapFocus[3]) / 2
+                  (this.mapFocus[0] + this.mapFocus[2]) / 2, (this.mapFocus[1] + this.mapFocus[3]) / 2
                 ],
               zoom: 3.5
             });

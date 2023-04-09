@@ -31,14 +31,14 @@ const colors = scaleQuantize().domain([0, 101]).range(palattes[2]);
 export const Stats = ({geoid, hazard, eal_source_id, eal_view_id, size = 'large', isTotal=false}) => {
   const {falcor, falcorCache} = useFalcor();
   const [nriIds, setNriIds] = useState({source_id: null, view_id: null});
-  const [nceieIds, setNceieIds] = useState({source_id: null, view_id: null});
+  const [fusionIds, setfusionIds] = useState({source_id: null, view_id: null});
   const pgEnv = useSelector(selectPgEnv);
   const freqCol = `${get(hazardsMeta, [hazard, 'prefix'], 'total')}_afreq`,
         expCol  = `${get(hazardsMeta, [hazard, 'prefix'], 'total')}_expt`;
   const npCol = isTotal ? 'national_percent_total' : 'national_percent_hazard',
         spCol = isTotal ? 'state_percent_total' : 'state_percent_hazard',
         ealCol = isTotal ? 'avail_eal_total' : 'avail_eal',
-        nceiGroupByCol = isTotal ? 'geoid' : 'nri_category';
+        fusionGroupByCol = isTotal ? 'geoid' : 'nri_category';
 
   const blockClass = {
     large: 'flex flex-col pt-2',
@@ -54,35 +54,42 @@ export const Stats = ({geoid, hazard, eal_source_id, eal_view_id, size = 'large'
   };
 
   let nriPath = ({source_id, view_id}) => ['nri', pgEnv, 'source', source_id, 'view', view_id, 'byGeoid', geoid];
-  let nceiePath = ({source_id, view_id}) => ['ncei_storm_events_enhanced', pgEnv, 'source', source_id, 'view', view_id, 'lossByGeoid', geoid, nceiGroupByCol]
+  let fusionOptions = JSON.stringify({
+    filter: isTotal ? { geoid: [geoid] } : { geoid: [geoid], nri_category: [hazard] },
+    groupBy: isTotal ? ['geoid'] : ['geoid', 'nri_category']
+  }),
+    actualDamageCol = 'sum(fusion_property_damage) + sum(fusion_crop_damage) + sum(swd_population_damage) as actual_damage',
+    fusionAttributes = isTotal ? ['geoid', actualDamageCol] :
+      ['geoid', 'nri_category', actualDamageCol],
+    fusionPath = ({view_id}) => ['dama', pgEnv, 'viewsbyId', view_id, 'options', fusionOptions]
 
   React.useEffect(() => {
     falcor.get(
       ['dama', pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       ['comparative_stats', pgEnv, 'byEalIds', 'source', eal_source_id, 'view', eal_view_id, 'byGeoid'],
-      ).then((res) => {
+      ).then(async (res) => {
         const deps = get(res, ['json', 'dama', pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id, 'dependencies']);
         const nriView = deps.find(d => d.type === 'nri');
-        const nceieView = deps.find(d => d.type === 'ncei_storm_events_enhanced');
+        const fusionView = deps.find(d => d.type === 'fusion');
 
         setNriIds(nriView);
-        setNceieIds(nceieView)
+        setfusionIds(fusionView);
 
+        const len = 1;
+        const fusionByIndexRoute = [...fusionPath(fusionView), 'databyIndex', {from: 0, to: len - 1}, fusionAttributes];
 
-        return falcor.get(
-          [...nriPath(nriView), [freqCol, expCol]],
-          nceiePath(nceieView)
-        );
+        const routes = isTotal && len ? [fusionByIndexRoute] :
+                      !isTotal && len ? [[...nriPath(nriView), [freqCol, expCol]], fusionByIndexRoute] : []
+        return falcor.get(...routes);
       })
   }, [geoid, hazard, falcorCache])
 
-
   const data = get(falcorCache, ['comparative_stats', pgEnv, 'byEalIds', 'source', eal_source_id, 'view', eal_view_id, 'byGeoid', 'value'], [])
-                  .find(row => row.geoid === geoid && row.nri_category === hazard);
+                  .find(row => row.geoid === geoid && (row.nri_category === hazard || isTotal));
 
   const nationalPercentile = get(data, npCol, 0) * 100;
   const statePercentile = get(data, spCol, 0) * 100;
-  const actualLoss = get(falcorCache, [...nceiePath(nceieIds), 'value'], [])
+  const actualLoss = get(falcorCache, [...fusionPath(fusionIds), 'value'], [])
                         .find(row => row.geoid === geoid && (row.nri_category === hazard || isTotal))
 
 
@@ -114,7 +121,11 @@ export const Stats = ({geoid, hazard, eal_source_id, eal_view_id, size = 'large'
         </div>
         <div className={blockWrapper[size]}>
           <div className={blockClass[size]}><label>EAL</label> <span className={'font-medium text-gray-800'}>${fnumIndex(get(data, ealCol, 0))}</span></div>
-          <div className={blockClass[size]}><label>Actual  Loss</label> <span className={'font-medium text-gray-800'}>${fnumIndex(get(actualLoss, 'total_damage', 0))}</span></div>
+          <div className={blockClass[size]}><label>Actual Loss</label>
+            <span className={'font-medium text-gray-800'}>
+              ${fnumIndex(get(falcorCache, [...fusionPath(fusionIds), 'databyIndex', 0, actualDamageCol]))}
+            </span>
+          </div>
           {
             !isTotal ?
               <>
