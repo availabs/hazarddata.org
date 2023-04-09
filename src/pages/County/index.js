@@ -74,9 +74,7 @@ const ProcessDataForMap = (data) => React.useMemo(() => {
       }, {});
     return { year, ...lossData, ...swdTotalPerYear, ...ofdTotalPerYear };
   });
-  console.log(
-    processed_data.reduce((acc, curr) => acc + curr.swd_td ,0), swdTotal.swd_ttd
-  )
+
   return { processed_data, total: [{...swdTotal, ...ofdTotal, ...{ "year": "total" }}], disaster_numbers: [...disaster_numbers], event_ids: [...event_ids] };
 }, [data]);
 
@@ -168,27 +166,51 @@ const RenderBarChart = ({ chartDataActiveView, disaster_numbers }) => (
   </div>
 );
 
-const RenderPieChart = ({ data }) => (
-  <div className={`w-full pt-10 my-1 block flex flex-col`} style={{ height: "350px" }}>
-    <label key={"nceiLossesTitle"} className={"text-lg"}>
-    </label>
-    <PieGraph
-      key={"numEvents"}
-      data={data}
-      keys={[`swd_ttd`, `ofd_ttd`]}
-      indexBy={"year"}
-      axisBottom={d => d}
-      axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
-      paddingInner={0.1}
-      hoverComp={{
-        HoverComp: HoverComp,
-        valueFormat: fnumIndex,
-        keyFormat: k => colNameMapping[k] || k
-      }}
-      groupMode={"stacked"}
-    />
-  </div>
-);
+const RenderPieChart = ({ data }) => {
+  const pieColors = {
+    ofd_ttd: '#0089ff',
+    swd_ttd: '#ff003b'
+}
+  return (
+    <div className={`w-full pt-10 my-1 block flex flex-col`} style={{ height: "350px" }}>
+      <div className={"flex flex-col"}>
+        {
+          Object.keys(pieColors)
+            .map(key => {
+
+              return (
+                <div className={"mb-1 pb-1 pl-1 flex"} key={key}>
+                  <div className={"rounded-full"}
+                       style={{
+                         height: "20px",
+                         width: "20px",
+                         backgroundColor: pieColors[key]
+                       }} />
+                  <span className={"pl-2"}>{colNameMapping[key]}</span>
+                </div>
+              )
+            })
+        }
+      </div>
+      <PieGraph
+        key={"numEvents"}
+        data={data}
+        keys={Object.keys(pieColors)}
+        colors={Object.values(pieColors)}
+        indexBy={"year"}
+        axisBottom={d => d}
+        axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+        paddingInner={0.1}
+        hoverComp={{
+          HoverComp: HoverComp,
+          valueFormat: fnumIndex,
+          keyFormat: k => colNameMapping[k] || k
+        }}
+        groupMode={"stacked"}
+      />
+    </div>
+  );
+};
 
 const RenderStatsGrid = ({ geoid, eal_source_id, eal_view_id }) => (
   <div className={`grid grid-cols-6 gap-2 mt-10`}>
@@ -211,7 +233,8 @@ const RenderDeclaredDisasters = ({ lossByYearByDisasterNumber, disaster_numbers 
         ['year', 'disaster_number', 'fusion_property_damage', 'fusion_crop_damage', 'swd_population_damage'].map(col => ({
           Header: colNameMapping[col] || col,
           accessor: (c) => ['year', 'disaster_number'].includes(col) ? c[col] : fnum(c[col]),
-          align: 'left'
+          align: 'left',
+          disableFilters: !['year', 'disaster_number'].includes(col)
         }))
       }
       data={lossByYearByDisasterNumber.filter(row => disaster_numbers.includes(row.disaster_number)).sort((a,b) => +b.year - +a.year)}
@@ -233,7 +256,8 @@ const RenderNonDeclaredEvents = ({ lossByYearByDisasterNumber, disaster_numbers 
             col === 'disaster_number' ? 'event_id' : colNameMapping[col] || col,
           accessor: (c) => ['year'].includes(col) ? c[col] :
             col === 'disaster_number' ? c[col].split('_')[1] : fnum(c[col] || 0),
-          align: 'left'
+          align: 'left',
+          disableFilters: !['year', 'disaster_number'].includes(col)
         }))
       }
       data={lossByYearByDisasterNumber.filter(row => !disaster_numbers.includes(row.disaster_number)).sort((a,b) => +b.year - +a.year)}
