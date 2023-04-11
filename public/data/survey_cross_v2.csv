@@ -99,7 +99,7 @@ Person-Level,School-related,School location,Smartphone Pilot,school_lon,School l
 Person-Level,School-related,School location,Smartphone Pilot,school_lat,School latitude,school_lat,School latitude,,1,,,,,,,,,,,,,,,,,,SYCORD,School Y Latitude (in WGS 84),,1,,,1,,,
 Person-Level,School-related,School location,RHTS,STAZ,School Location TAZ (NYMTC),,,,,,,,,,,,,,,,,,,,,,STAZ,School Location TAZ (NYMTC),,1,,,,,,
 Person-Level,School-related,School location,RHTS,STRACT,School Location Census Tract 2010,,,,,,,,,,,,,,,,,,,,,,STRACT,School Location Census Tract 2010,,1,,,,,,
-Person-Level,School-related,School location,Smartphone Pilot,school_county,School county (fips code),school_county,School county (fips code),,1,,,,,,,,,,,,,,,,,,SFIPS,School Location County,,1,,,,,,
+Person-Level,School-related,School location,Smartphone Pilot,school_county,School county (fips code),school_county,School county (fips code),,1,,,,,,,,,,,,,,,,,,SFIPS,School Location Index,,1,,,,,,
 Person-Level,School-related,,NYCDOT Mobility Survery,kid_accompany,Parent or guardian accompanies child/ren on their trip to school or daycare,,,,,,,,,kid_accompany,Parent or guardian accompanies child/ren on their trip to school or daycare,,1,,,,,,,,,,,,,,,,,,,
 Person-Level,School-related,Park location,NYCDOT Mobility Survery,school_park_location,Vehicle parking location at school,,,,,,,,,school_park_location,Vehicle parking location at school,,1,,,,,,,,,,,,,,,,,,,
 Person-Level,School-related,Park Cost,NYCDOT Mobility Survery,school_park_amount_day | school_park_amount_month | school_park_amount_week | school_park_amount_year,Amount paid to park at school per day | Amount paid to park at school per week | Amount paid to park at school per month | Amount paid to park at school per year,,,,,,,,,school_park_amount_day | school_park_amount_month | school_park_amount_week | school_park_amount_year,Amount paid to park at school per day | Amount paid to park at school per week | Amount paid to park at school per month | Amount paid to park at school per year,,1,,,,,,,,,,,,,,,,,,,
@@ -289,7 +289,7 @@ Trip-Level,General trip characteristics,Leg-duration,Smartphone Pilot,dwell_minu
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_lat,Origin latitude,o_lat,Origin latitude,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_lon,Origin longitude,o_lon,Origin longitude,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_bg,Origin block group,o_bg,Origin block group,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
-Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_county,Origin county (fips code),o_county,Origin county (fips code),,,,,1,,,,,,,,,,,,,,,CTFIP,County FIPS,1,,,1,,1,1,1
+Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_county,Origin county (fips code),o_county,Origin county (fips code),,,,,1,,,,,,,,,,,,,,,CTFIP,Index FIPS,1,,,1,,1,1,1
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_state,Origin state (fips code),o_state,Origin state (fips code),,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_puma,Origin Public Use Microdata Area (PUMA),o_puma,Origin Public Use Microdata Area (PUMA),,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
 Trip-Level,General trip characteristics,Origin Location,Smartphone Pilot,o_in_region,Origin in study region,o_in_region,Origin in study region,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
@@ -446,7 +446,7 @@ Household-Level,Survey-related,Home location,Smartphone Pilot,sample_home_state,
 Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_lat,Reported home latitude,home_lat,Reported home latitude,1,,,,,,,,,,,,,,,,,,,HYCORD,Home Y Latitude (in WGS 84),1,,,,1,1,,
 Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_lon,Reported home longitude,home_lon,Reported home longitude,1,,,,,,,,,,,,,,,,,,,HXCORD,Home X Longitude (in WGS 84),1,,,,1,1,,
 Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_bg,Reported home block group,home_bg,Reported home block group,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_county,Reported home county (fips code),home_county,Reported home county (fips code),1,,,,,,,,,,,,,,,,,,,HCOUNTY,Home County,,,,,2,2,2,
+Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_county,Reported home county (fips code),home_county,Reported home county (fips code),1,,,,,,,,,,,,,,,,,,,HCOUNTY,Home Index,,,,,2,2,2,
 Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_state,Reported home state (fips code),home_state,Reported home state (fips code),1,,,,,,,,,,,,,,,,,,,HSTATE,Home State,2,,,,,2,2,2
 Household-Level,Household Characteristics,Home location,Smartphone Pilot,home_in_region,Reported home in region,home_in_region,Reported home in region,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Household-Level,Household Characteristics,Household Income,Smartphone Pilot,income_aggregate,Household income (aggregate categories),income_aggregate,Household income (aggregate categories),1,,,,,,income_aggregate,Household's total annual income: aggregate categories,1,,,,,,,,,,,,,,,,,,,,
@@ -927,7 +927,7 @@ Trip-Level,General trip characteristics,Leg-Purpose,NHTS,WHYTRP1S,Trip purpose s
 Trip-Level,General trip characteristics,Leg-Purpose,NHTS,WHYTRP90,Travel day trip purpose consistent with 1990 NPTS design.,,,,,,,,,,,,,,,,WHYTRP90,Travel day trip purpose consistent with 1990 NPTS design.,,,,1,,,,,,,,,,
 Person-Level,Work-related,Work location,NHTS,WKFMHMXX,Count of Days Worked From Home in Last Month,,,,,,,,,,,,,,,,WKFMHMXX,Count of Days Worked From Home in Last Month,,1,,,,,,,,,,,,
 Person-Level,Work-related,Work location,NHTS,WKRMHM,Option of Working from Home,,,,,,,,,,,,,,,,WKRMHM,Option of Working from Home,,1,,,,,,,,,,,,
-Person-Level,Work-related,Work location,NHTS,WKSTFIPS,The state FIPS code for the respondent's geocoded work address. The state FIPS codes were identified using United States Census Bureau 2016 TIGER/Line Shapefiles.,,,,,,,,,,,,,,,,WKSTFIPS,The state FIPS code for the respondent's geocoded work address. The state FIPS codes were identified using United States Census Bureau 2016 TIGER/Line Shapefiles.,,1,,,WFIPS,Work Location County,,2,,,,,,
+Person-Level,Work-related,Work location,NHTS,WKSTFIPS,The state FIPS code for the respondent's geocoded work address. The state FIPS codes were identified using United States Census Bureau 2016 TIGER/Line Shapefiles.,,,,,,,,,,,,,,,,WKSTFIPS,The state FIPS code for the respondent's geocoded work address. The state FIPS codes were identified using United States Census Bureau 2016 TIGER/Line Shapefiles.,,1,,,WFIPS,Work Location Index,,2,,,,,,
 Person-Level,Work-related,,NHTS,WRKTIME,Arrival Time at Work,,,,,,,,,,,,,,,,WRKTIME,Arrival Time at Work,,1,,,,,,,,,,,,
 Person-Level,Person characteristics,,NHTS,MEDDVCUSED,Medical Device Used,,,,,,,,,,,,,,,,"W_CANE |
 W_CHAIR |
@@ -960,7 +960,7 @@ Household-Level,Household Characteristics,Home location,RHTS,HCITY_MCD,Home City
 Household-Level,Household Characteristics,Home location,RHTS,HZIP,Home Zip Code,,,,,,,,,,,,,,,,,,,,,,HZIP,Home Zip Code,1,,,,,1,1,1
 Household-Level,Survey-related,,RHTS,PARTIAL,Flag for Partially Completed Households,,,,,,,,,,,,,,,,,,,,,,PARTIAL,Flag for Partially Completed Households,1,1,,,,,,
 Household-Level,Identifier,,RHTS,HH1,Domain,,,,,,,,,,,,,,,,,,,,,,HH1,Domain,1,1,1,1,1,1,1,1
-Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUP1,County Group: Level 1,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP1,County Group: Level 1,1,1,,1,,,,
+Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUP1,Index Group: Level 1,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP1,Index Group: Level 1,1,1,,1,,,,
 Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUP2,Regional Boundaries: Level 2,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP2,Regional Boundaries: Level 2,1,1,,1,,,,
 Household-Level,Household Characteristics,Home location,RHTS,GEO_GROUP3,Political Boundaries: Level 3,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP3,Political Boundaries: Level 3,1,1,,1,,,,
 Household-Level,Household Characteristics,Home location,RHTS,HTAZ,Home TAZ (NYMTC),,,,,,,,,,,,,,,,,,,,,,HTAZ,Home TAZ (NYMTC),1,,,,1,1,1,1
@@ -1174,7 +1174,7 @@ Trip-Level,General trip characteristics,Leg-Mode,RHTS,TOURMODE,Tour Mode,,,,,,,,
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP1_P,Geo group 1 for Primary Destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP1_P,Geo group 1 for Primary Destination,,,,,,,1,
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP2_P,Geo group 2 for Primary Destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP2_P,Geo group 2 for Primary Destination,,,,,,,1,
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP3_P,Geo group 3 for Primary Destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP3_P,Geo group 3 for Primary Destination,,,,,,,1,
-Trip-Level,General trip characteristics,Destination Location,RHTS,PCOUNTY,Prime Destination County,,,,,,,,,,,,,,,,,,,,,,PCOUNTY,Prime Destination County,,,,,,,1,
+Trip-Level,General trip characteristics,Destination Location,RHTS,PCOUNTY,Prime Destination Index,,,,,,,,,,,,,,,,,,,,,,PCOUNTY,Prime Destination Index,,,,,,,1,
 Trip-Level,General trip characteristics,Destination Location,RHTS,SUBT_DPRIOR,Priority for Subtour Destination,,,,,,,,,,,,,,,,,,,,,,SUBT_DPRIOR,Priority for Subtour Destination,,,,,,,,1
 Trip-Level,General trip characteristics,Destination Location,RHTS,SUBT_DTRPNO,Trip No. for Subtour Destination,,,,,,,,,,,,,,,,,,,,,,SUBT_DTRPNO,Trip No. for Subtour Destination,,,,,,,,1
 Trip-Level,General trip characteristics,Destination Purpose,RHTS,SUBT_PURP,Subtour Purpose,,,,,,,,,,,,,,,,,,,,,,SUBT_PURP,Subtour Purpose,,,,,,,,1
@@ -1208,6 +1208,6 @@ Trip-Level,General trip characteristics,Origin Location,RHTS,GEO_GROUP3_O,Geo gr
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP1_D,Geo group 1 for destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP1_D,Geo group 1 for destination,,,,,1,1,,1
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP2_D,Geo group 2 for destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP2_D,Geo group 2 for destination,,,,,1,1,,1
 Trip-Level,General trip characteristics,Destination Location,RHTS,GEO_GROUP3_D,Geo group 3 for destination,,,,,,,,,,,,,,,,,,,,,,GEO_GROUP3_D,Geo group 3 for destination,,,,,1,1,,1
-Trip-Level,General trip characteristics,Location unspecified,RHTS,ADJ_COUNTY,Adjacent County flags,,,,,,,,,,,,,,,,,,,,,,ADJ_COUNTY,Adjacent County flags,,,,,1,1,1,1
-Trip-Level,General trip characteristics,Origin Location,RHTS,OCOUNTY,Origin County,,,,,,,,,,,,,,,,,,,,,,OCOUNTY,Origin County,,,,,1,1,1,1
-Trip-Level,General trip characteristics,Destination Location,RHTS,DCOUNTY,Destination County,,,,,,,,,,,,,,,,,,,,,,DCOUNTY,Destination County,,,,,1,1,,1
+Trip-Level,General trip characteristics,Location unspecified,RHTS,ADJ_COUNTY,Adjacent Index flags,,,,,,,,,,,,,,,,,,,,,,ADJ_COUNTY,Adjacent Index flags,,,,,1,1,1,1
+Trip-Level,General trip characteristics,Origin Location,RHTS,OCOUNTY,Origin Index,,,,,,,,,,,,,,,,,,,,,,OCOUNTY,Origin Index,,,,,1,1,1,1
+Trip-Level,General trip characteristics,Destination Location,RHTS,DCOUNTY,Destination Index,,,,,,,,,,,,,,,,,,,,,,DCOUNTY,Destination Index,,,,,1,1,,1

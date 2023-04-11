@@ -9,6 +9,7 @@ import { selectPgEnv } from "../../../pages/DataManager/store";
 import { Link } from "react-router-dom";
 import get from "lodash.get";
 import {BarGraph} from "modules/avl-graph/src";
+import { Search } from "../../../pages/County/components/search";
 
 const hlrSourceId = 218,
   enhancedNCEIhlrSourceId = 198,
@@ -201,6 +202,9 @@ const Home = ({ baseUrl = "/datasources" }) => {
   return (
     <>
       <div className={blockClasses} style={{ height: "600px" }}>
+        <div className={'p-2 w-full text-3xl'}>
+          <Search className={'float-right'}/>
+        </div>
         <label key={"nceiLossesTitle"} className={"text-lg"}> NCEI Losses </label>
         <label key={"nceiLossesDeps"} className={"text-sm mb-2"}>using:
           <RenderViewDependencies dama={dama} srcMeta={srcMeta} viewId={enhancedNCEILTSViewId} baseUrl={baseUrl}/></label>
