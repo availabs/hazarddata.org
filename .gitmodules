@@ -7,9 +7,22 @@
 [submodule "src/modules/avl-graph"]
 	path = src/modules/avl-graph
 	url = git@github.com:availabs/avl-graph.git
+[submodule "src/modules/avl-maplibre"]
+	path = src/modules/avl-maplibre
+	url = git@github.com:availabs/avl-maplibre.git
+[submodule "src/modules/ams"]
+	path = src/modules/ams
+	url = git@github.com:availabs/ams.git
+[submodule "src/modules/vite-dmstest"]
+	path = src/modules/vite-dmstest
+	url = git@github.com:availabs/vite-dmstest.git
 [submodule "src/pages/DataManager"]
 	path = src/pages/DataManager
+<<<<<<< HEAD
 	url = https://github.com/availabs/DataManagerClient
 [submodule "src/modules/avl-maplibre"]
 	path = src/modules/avl-maplibre
 	url = git@github.com:availabs/avl-maplibre.git
+=======
+	url = git@github.com:availabs/DataManagerClient.git
+>>>>>>> d6b0811656368af290b7e518677834ae1a373b8b

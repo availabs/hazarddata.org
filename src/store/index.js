@@ -1,6 +1,6 @@
 import { messages } from "modules/avl-components/src";
 
-import { Reducers } from "@availabs/ams";
+import { Reducers } from "modules/ams/src";
 
 import data_manager from "pages/DataManager/store";
 

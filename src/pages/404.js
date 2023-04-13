@@ -12,6 +12,7 @@ const NoMatch = () =>
 
 
 const config = {
+  path: '*',
   mainNav: false,
   component: NoMatch,
   layoutSettings: {
