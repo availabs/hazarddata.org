@@ -202,8 +202,8 @@ const Home = ({ baseUrl = "/datasources" }) => {
   return (
     <>
       <div className={blockClasses} style={{ height: "600px" }}>
-        <div className={'p-2 w-full text-3xl'}>
-          <Search className={'float-right'}/>
+        <div className={'p-2 text-3xl'}>
+          <Search className={'object-fill float-right'}/>
         </div>
         <label key={"nceiLossesTitle"} className={"text-lg"}> NCEI Losses </label>
         <label key={"nceiLossesDeps"} className={"text-sm mb-2"}>using:

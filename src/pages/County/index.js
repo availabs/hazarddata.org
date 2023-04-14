@@ -10,11 +10,12 @@ import { useParams } from "react-router-dom";
 import { AvlMap } from "../../modules/avl-map/src";
 import config from "config.json";
 import { HighlightCountyFactory } from "./components/highlightCountyLayer";
-import { Stats } from "./components/Stats";
+import { HazardStatBox } from "./components/HazardStatBox";
 import get from "lodash.get";
 import { BarGraph, PieGraph } from "../../modules/avl-graph/src";
 import { fnum, fnumIndex } from "../DataManager/utils/macros";
 import { Search } from "./components/search";
+import { DisastersTable } from "./components/disastersTable";
 
 const colNameMapping = {
   swd_population_damage: 'Population Damage',
@@ -218,7 +219,7 @@ const RenderStatsGrid = ({ geoid, eal_source_id, eal_view_id }) => (
       Object.keys(hazardsMeta)
         .sort((a, b) => a.localeCompare(b))
         .map(key => (
-          <Stats hazard={key} geoid={geoid} eal_source_id={eal_source_id} eal_view_id={eal_view_id} size={"small"} />
+          <HazardStatBox hazard={key} geoid={geoid} eal_source_id={eal_source_id} eal_view_id={eal_view_id} size={"small"} />
         ))
     }
   </div>
@@ -276,12 +277,7 @@ const County = ({ baseUrl }) => {
   const fusionSourceId = 336,
         fusionViewId = 506;
 
-  const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId],
-
-    geoNameCols = ["namelsad"],
-    geoNameOptions = JSON.stringify({ filter: { geoid: [geoid] }, groupBy: [], orderBy: [] }),
-    geoNameIndices = { from: 0, to: 0 },
-    geoNamePath = ({ view_id }) => ["dama", pgEnv, "viewsbyId", view_id, "options", geoNameOptions, "databyIndex"];
+  const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
 
   const map_layers = useMemo(() => [ HighlightCountyFactory() ], []);
 
@@ -289,10 +285,10 @@ const County = ({ baseUrl }) => {
     falcor.get(dependencyPath).then(res => {
 
       const deps = get(res, ["json", ...dependencyPath, "dependencies"]);
-      const countyView = deps.find(d => d.type === "tl_county");
+      const fusionView = deps.find(d => d.type === "fusion");
+      console.log('deps', fusionSourceId, fusionViewId, deps.find(d => d.type === "fusion"))
 
       return falcor.get(
-        [...geoNamePath(countyView), geoNameIndices, geoNameCols],
         ["fusion", pgEnv, "source", fusionSourceId, "view", fusionViewId, "byGeoid", geoid, ["lossByYearByDisasterNumber"]]
       );
     });
@@ -304,11 +300,11 @@ const County = ({ baseUrl }) => {
 
   return (
     <div className="max-w-6xl mx-auto p-4 my-1 block">
-      <span className={`text-4xl p-5`}><Search value={geoid} /></span>
+      <span className={`text-4xl p-5 w-full`}><Search value={geoid} /></span>
 
       <div className={`flex justify-between place-center`}>
         <div className={`mr-5 shrink w-full`}>
-          <Stats isTotal={true} geoid={geoid} eal_source_id={ealSourceId} eal_view_id={ealViewId} />
+          <HazardStatBox isTotal={true} geoid={geoid} eal_source_id={ealSourceId} eal_view_id={ealViewId} />
         </div>
         <RenderMap map_layers={map_layers} layerProps={{ hlc: { geoid, pgEnv } }} falcor={falcor} />
       </div>
@@ -323,8 +319,10 @@ const County = ({ baseUrl }) => {
         </div>
 
         <div className={`flex flex-col text-sm`}>
-          <RenderDeclaredDisasters disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />
-          <RenderNonDeclaredEvents disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />
+          {/*<RenderDeclaredDisasters disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />*/}
+          <DisastersTable type={'declared'} geoid={geoid}/>
+          <DisastersTable type={'non-declared'} geoid={geoid}/>
+          {/*<RenderNonDeclaredEvents disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />*/}
         </div>
       </div>
 
