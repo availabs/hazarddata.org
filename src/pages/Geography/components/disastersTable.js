@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import get from 'lodash.get';
-import { getColorRange, Table, useFalcor } from "../../../modules/avl-components/src";
+import { Table, useFalcor } from "../../../modules/avl-components/src";
 import { useSelector } from 'react-redux';
 import { selectPgEnv } from '../../DataManager/store';
-import { RenderSvgBar } from './svgBar';
-import {
-  hazardsMeta,
-  ctypeColors
-} from '../../DataManager/DataTypes/constants/colors';
-import { fnum, fnumIndex } from "../../DataManager/utils/macros";
-import { useParams } from "react-router-dom";
+import { fnum } from "../../DataManager/utils/macros";
 
 const colNameMapping = {
   swd_population_damage: 'Population Damage',
@@ -24,6 +18,9 @@ const colNameMapping = {
   year: 'Year'
 }
 
+const colAccessNameMapping = {
+  'disaster_number': 'distinct disaster_number as disaster_number'
+}
 export const DisastersTable = ({
   type= 'non-declared',
   fusionViewId = 506,
@@ -31,6 +28,8 @@ export const DisastersTable = ({
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
+  const [disasterDecView, setDisasterDecView] = useState();
+  const [disasterNumbers, setDisasterNumbers] = useState([]);
 
   const fusionGeoCol = `substring(geoid, 1, ${geoid.length})`,
     fusionAttributes = [
@@ -65,15 +64,38 @@ export const DisastersTable = ({
       }),
     fusionPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
 
+  const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", fusionViewId];
+
+  const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],
+    disasterNamePath = (view_id, disasterNumbers) =>
+    ['dama', pgEnv,  "viewsbyId", view_id,
+    "options", JSON.stringify({ filter: { disaster_number: disasterNumbers}}),
+    'databyIndex']
+
   useEffect(async () => {
     const lenRes = await falcor.get([...fusionPath(fusionViewId), fusionLenOptions, 'length']);
     const len = Math.min(get(lenRes, ['json', ...fusionPath(fusionViewId), fusionLenOptions, 'length'], 0), 100),
-    fusionIndices = { from: 0, to: len - 1 }
+          fusionIndices = { from: 0, to: len - 1 }
 
-    return falcor.get(
+    const res = await falcor.get(
+      dependencyPath,
       [...fusionPath(fusionViewId), fusionOptions, 'databyIndex', fusionIndices, fusionAttributes]
     );
+
+    const disasterNumbers = [...new Set(Object.values(get(res, ['json', ...fusionPath(fusionViewId), fusionOptions, 'databyIndex'], {}))
+      .map(d => d.disaster_number)
+      .filter(d => d))];
+
+    if(disasterNumbers.length){
+      const deps = get(res, ["json", ...dependencyPath, "dependencies"], []).find(d => d.type === "disaster_declarations_summaries_v2");
+      setDisasterNumbers(disasterNumbers);
+      setDisasterDecView(deps.view_id);
+      await falcor.get([...disasterNamePath(deps.view_id, disasterNumbers), {from: 0, to: disasterNumbers.length - 1}, disasterNameAttributes]);
+    }
+
   }, [geoid]);
+
+  const disasterNames = Object.values(get(falcorCache, [...disasterNamePath(disasterDecView, disasterNumbers)], {}));
 
   return (
     <div className={'py-5'}>
@@ -84,7 +106,9 @@ export const DisastersTable = ({
             const mappedName = colNameMapping[col.includes(' as ') ? col.split(' as ')[1] : col] || col;
             return {
               Header:  mappedName,
-              accessor: (c) => ['Year', 'Disaster Number', 'Event Id'].includes(mappedName) ? c[col] : fnum(c[col]),
+              accessor: (c) => mappedName === 'Disaster Number' ?
+                get(disasterNames.find(dns => dns[colAccessNameMapping.disaster_number] === c.disaster_number), 'declaration_title', 'No Title') + ` (${c.disaster_number})` :
+                ['Year', 'Event Id'].includes(mappedName) ? c[col] : fnum(c[col]),
               Cell: cell => typeof cell.value === "object" ? 0 : cell.value || 0,
               align: 'left',
               disableFilters: !['Year', 'Disaster Number', 'Event Id'].includes(mappedName)
@@ -93,8 +117,7 @@ export const DisastersTable = ({
         }
         data={
         Object.values(get(falcorCache, [...fusionPath(fusionViewId), fusionOptions, 'databyIndex'], {}))
-          .filter(a => typeof a[fusionAttributes[1]] !== 'object')
-          // .sort((a,b) => +b.year - +a.year)
+              .filter(a => typeof a[fusionAttributes[1]] !== 'object')
       }
         sortBy={'Year'}
         pageSize={5}

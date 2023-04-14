@@ -9,7 +9,7 @@ import { selectPgEnv } from "../../../pages/DataManager/store";
 import { Link } from "react-router-dom";
 import get from "lodash.get";
 import {BarGraph} from "modules/avl-graph/src";
-import { Search } from "../../../pages/County/components/search";
+import { Search } from "../../../pages/Geography/components/search";
 
 const hlrSourceId = 218,
   enhancedNCEIhlrSourceId = 198,

@@ -82,8 +82,8 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								icon: "os-icon os-icon-home-10",
 							},
 							{
-								name: "County",
-								path: `/county/36001`,
+								name: "Geography",
+								path: `/geography/36001`,
 								icon: "os-icon os-icon-home-10",
 							},
 							{

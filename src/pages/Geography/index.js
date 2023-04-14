@@ -26,7 +26,7 @@ const colNameMapping = {
   ofd_ttd: 'Declared Total',
 }
 
-const ProcessDataForMap = (data) => React.useMemo(() => {
+const ProcessDataForMap = (data, disasterNames) => React.useMemo(() => {
   const years = [...new Set(data.map(d => d.year))];
   const disaster_numbers = new Set(['swd']);
   const event_ids = new Set();
@@ -40,7 +40,7 @@ const ProcessDataForMap = (data) => React.useMemo(() => {
     const lossData = data
       .filter(d => d.year === year)
       .reduce((acc, d) => {
-        const tmpDn = d.disaster_number;
+        const tmpDn = d.disaster_number === 'SWD' ? d.disaster_number : get(disasterNames, [d.disaster_number], 'No Title') + ` (${d.disaster_number})`;
         const tmpPd = +d.fusion_property_damage || 0,
               tmpCd =  +d.fusion_crop_damage || 0,
               tmptd = tmpPd + tmpCd + (+d.swd_population_damage || 0);
@@ -267,10 +267,12 @@ const RenderNonDeclaredEvents = ({ lossByYearByDisasterNumber, disaster_numbers 
   </div>
 );
 
-const County = ({ baseUrl }) => {
+const Geography = ({ baseUrl }) => {
   const { geoid } = useParams();
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
+  const [disasterDecView, setDisasterDecView] = useState();
+  const [disasterNumbers, setDisasterNumbers] = useState([]);
 
   const ealSourceId = 229,
         ealViewId = 511;
@@ -278,25 +280,49 @@ const County = ({ baseUrl }) => {
         fusionViewId = 506;
 
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
+  const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],
+        disasterNamePath = (view_id) =>
+          ['dama', pgEnv,  "viewsbyId", view_id,
+            "options"];
 
   const map_layers = useMemo(() => [ HighlightCountyFactory() ], []);
 
-  useEffect(() => {
-    falcor.get(dependencyPath).then(res => {
+  useEffect(async () => {
+    falcor.get(dependencyPath).then(async res => {
 
       const deps = get(res, ["json", ...dependencyPath, "dependencies"]);
       const fusionView = deps.find(d => d.type === "fusion");
-      console.log('deps', fusionSourceId, fusionViewId, deps.find(d => d.type === "fusion"))
-
-      return falcor.get(
+      const lossRes = await falcor.get(
         ["fusion", pgEnv, "source", fusionSourceId, "view", fusionViewId, "byGeoid", geoid, ["lossByYearByDisasterNumber"]]
       );
+
+      const disasterNumbers = get(lossRes,
+        ['json', "fusion", pgEnv, "source", fusionSourceId, "view",
+          fusionViewId, "byGeoid", geoid, "lossByYearByDisasterNumber"], [])
+        .map(dns => dns.disaster_number)
+        .filter(dns => dns !== 'SWD')
+        .sort((a, b) => +a - +b);
+
+      if(disasterNumbers.length){
+        const ddcView = deps.find(d => d.type === "disaster_declarations_summaries_v2");
+        setDisasterNumbers(disasterNumbers);
+        setDisasterDecView(ddcView.view_id);
+        console.log('check', ddcView, disasterDecView, disasterNumbers.length)
+        return falcor.get([...disasterNamePath(deps.view_id), JSON.stringify({ filter: { disaster_number: disasterNumbers.sort((a, b) => +a - +b)}}),
+          'databyIndex', {from: 0, to: disasterNumbers.length - 1}, disasterNameAttributes]);
+      }
     });
   }, [geoid]);
 
+  const disasterNames = Object.values(get(Object.values(get(falcorCache, [...disasterNamePath(disasterDecView)], {})), [0, 'databyIndex'], {}))
+    .reduce((acc, disaster) => {
+        acc[disaster['distinct disaster_number as disaster_number']] = disaster.declaration_title;
+        return acc;
+    }, {})
+
   const lossByYearByDisasterNumber = get(falcorCache, ["fusion", pgEnv, "source", fusionSourceId, "view",
     fusionViewId, "byGeoid", geoid, "lossByYearByDisasterNumber", "value"], []),
-    { processed_data: chartDataActiveView, disaster_numbers, event_ids, total } = ProcessDataForMap(lossByYearByDisasterNumber);
+    { processed_data: chartDataActiveView, disaster_numbers, total } = ProcessDataForMap(lossByYearByDisasterNumber, disasterNames);
 
   return (
     <div className="max-w-6xl mx-auto p-4 my-1 block">
@@ -318,11 +344,9 @@ const County = ({ baseUrl }) => {
           <RenderPieChart data={total} />
         </div>
 
-        <div className={`flex flex-col text-sm`}>
-          {/*<RenderDeclaredDisasters disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />*/}
+        <div className={`flex flex-col text-sm w-full`}>
           <DisastersTable type={'declared'} geoid={geoid}/>
           <DisastersTable type={'non-declared'} geoid={geoid}/>
-          {/*<RenderNonDeclaredEvents disaster_numbers={disaster_numbers} lossByYearByDisasterNumber={lossByYearByDisasterNumber} />*/}
         </div>
       </div>
 
@@ -331,8 +355,8 @@ const County = ({ baseUrl }) => {
 };
 
 const countyConfig = {
-  name: "County",
-  path: "/county/:geoid",
+  name: "Geography",
+  path: "/geography/:geoid",
   exact: false,
   auth: false,
   mainNav: false,
@@ -340,7 +364,7 @@ const countyConfig = {
     color: "dark",
     size: "none"
   },
-  component: County
+  component: Geography
 };
 
 export default countyConfig;

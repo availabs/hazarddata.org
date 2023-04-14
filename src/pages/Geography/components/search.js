@@ -16,13 +16,13 @@ const onChangeFilter = (selected, setSelected, value, geoData, navigate) => {
   const geoid = get(selected, [0, 'geoid']);
   if(geoid){
     setSelected(selected);
-    navigate(`/county/${geoid}`)
+    navigate(`/geography/${geoid}`)
   }else{
     setSelected([])
   }
 }
 const menuItemsLinks = (option) => {
-  return <Link key={option.geoid} className="block hover:bg-gray-200 text-xl tracking-wide" to={`/county/${option.geoid}`}>{option.name}</Link>;
+  return <Link key={option.geoid} className="block hover:bg-gray-200 text-xl tracking-wide" to={`/geography/${option.geoid}`}>{option.name}</Link>;
 }
 const menuItemsList = (option, props) => (
   <ul className={`bg-gray-100`}>
@@ -93,7 +93,6 @@ export const Search = ({ className, value }) => {
     setSelected(geoData.filter(gd => value && gd.geoid === value))
   }, [geoData, value]);
 
-  console.log(selected)
   return (
     <div className={`flex flex row ${className} w-full`}>
       <i className={`fa fa-search font-light text-xl text-gray-500 pr-2 pt-1`} />
@@ -102,8 +101,8 @@ export const Search = ({ className, value }) => {
         isLoading={false}
         onSearch={handleSearch}
         minLength = {2}
-        id="county-search"
-        key="county-search"
+        id="geography-search"
+        key="geography-search"
         placeholder="Search for a Geography..."
         options={geoData}
         labelKey={(option) => `${option.name}`}

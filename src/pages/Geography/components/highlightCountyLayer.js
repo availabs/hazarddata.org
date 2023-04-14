@@ -111,7 +111,6 @@ class EALChoroplethOptions extends LayerContainer {
 
   handleMapFocus(map) {
     if (this.mapFocus) {
-      console.log('mf', this.mapFocus, [[this.mapFocus[0], this.mapFocus[1]], [this.mapFocus[2], this.mapFocus[3]]])
       try {
         if(true || ['12', '36'].includes(this.props.geoid.substring(0, 2))){
           map.flyTo(
