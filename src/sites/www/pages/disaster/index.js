@@ -34,7 +34,7 @@ const Disaster = (props) => {
 })
 console.log('falcorChache-1',falcorCache)
 
-const metadata = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 512,'databyId']);
+const metadata = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 512,'databyId'], {});
 
 
 console.log(metadata)
