@@ -4,6 +4,7 @@ import { Table, useFalcor } from "../../../modules/avl-components/src";
 import { useSelector } from 'react-redux';
 import { selectPgEnv } from '../../DataManager/store';
 import { fnum } from "../../DataManager/utils/macros";
+import { Link } from "react-router-dom";
 
 const colNameMapping = {
   swd_population_damage: 'Population Damage',
@@ -107,9 +108,14 @@ export const DisastersTable = ({
             return {
               Header:  mappedName,
               accessor: (c) => mappedName === 'Disaster Number' ?
-                get(disasterNames.find(dns => dns[colAccessNameMapping.disaster_number] === c.disaster_number), 'declaration_title', 'No Title') + ` (${c.disaster_number})` :
-                ['Year', 'Event Id'].includes(mappedName) ? c[col] : fnum(c[col]),
-              Cell: cell => typeof cell.value === "object" ? 0 : cell.value || 0,
+                get(disasterNames.find(dns => dns[colAccessNameMapping.disaster_number] === c.disaster_number),
+                  'declaration_title', 'No Title') + ` (${c.disaster_number})` :
+                  ['Year', 'Event Id'].includes(mappedName) ? c[col] : fnum(c[col]),
+              Cell: cell => {
+                return mappedName === "Disaster Number" ?
+                  <Link to={`/disaster/${cell.row.original.disaster_number}/geography/${geoid}`}> {cell.value || 0} </Link> :
+                  <div> {cell.value || 0} </div>;
+              },
               align: 'left',
               disableFilters: !['Year', 'Disaster Number', 'Event Id'].includes(mappedName)
             }

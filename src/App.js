@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { BrowserRouter, Outlet, Route, Routes, useLocation,   createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, Routes } from "react-router-dom";
 
 import ScrollToTop from "utils/ScrollToTop";
 import DefaultRoutes from "Routes";
@@ -8,15 +8,14 @@ import get from "lodash.get";
 import {/*getDomain,*/getSubdomain } from "utils";
 
 import {
-  ComponentFactory, DefaultLayout, Messages
+  DefaultLayout, Messages
 } from "modules/avl-components/src";
 
-import transportNY from "sites/www";
-import Layouts from "./modules/avl-components/src/components/Layouts";
+import hazmit from "sites/www";
 
 
 const Sites = {
-  "hazardata": transportNY
+  "hazardata": hazmit
 };
 
 const App = (props) => {
