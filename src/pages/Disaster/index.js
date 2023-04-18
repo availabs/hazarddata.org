@@ -15,6 +15,7 @@ import { BarGraph, PieGraph } from "../../modules/avl-graph/src";
 import { fnum, fnumIndex } from "../DataManager/utils/macros";
 import { Header } from "./components/header";
 import { LossOverviewGrid } from "./components/lossOverviewGrid";
+import { SimpleTable } from "./components/Table";
 
 const RenderMap = ({ falcor, map_layers, layerProps }) => (
   <div className={`flex-none h-[200px] w-[300px]`}>
@@ -72,14 +73,47 @@ const Disaster = ({ baseUrl }) => {
     get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'disaster_declarations_summaries_v2');
   const disasterLossSummaryView =
     get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'disaster_loss_summary');
+  const ihpView =
+    get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'individuals_and_households_program_valid_registrations_v1');
+  const paView =
+    get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'public_assistance_funded_projects_details_v1');
+  const sbaView =
+    get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'sba_disaster_loan_data_new');
 
   return (
     <div className="max-w-6xl mx-auto p-4 my-1 block">
       <Header viewId={disasterDeclarationsSummaryView?.view_id} disasterNumber={disasterNumber} geoid={geoid}/>
       <LossOverviewGrid viewId={disasterLossSummaryView?.view_id} disasterNumbers={disasterNumber} geoid={geoid} />
-      <DummyBlock title={'IHP Table'} className={'w-full h-[250px] bg-gray-200 mt-5 text-center align-middle'}/>
-      <DummyBlock title={'PA Table'} className={'w-full h-[250px] bg-gray-200 mt-5 text-center align-middle'}/>
-      <DummyBlock title={'SBA Table'} className={'w-full h-[250px] bg-gray-200 mt-5 text-center align-middle'}/>
+      <div className={'w-full h-[250px] mt-5 align-middle'}>
+        <SimpleTable
+          title={'IHP Losses'}
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          viewId={ihpView?.view_id}
+          ddsViewId={disasterDeclarationsSummaryView?.view_id}
+          cols={['disaster_number', 'geoid', 'incident_type', 'rpfvl', 'ppfvl']}
+          />
+      </div>
+      <div className={'w-full h-[250px] mt-5 align-middle'}>
+        <SimpleTable
+          title={'PA Losses'}
+          disaster_number={disasterNumber}
+          // geoid={geoid}
+          viewId={paView?.view_id}
+          ddsViewId={disasterDeclarationsSummaryView?.view_id}
+          cols={['disaster_number', 'incident_type', 'project_amount']}
+        />
+      </div>
+      <div className={'w-full h-[250px] mt-5 align-middle'}>
+        <SimpleTable
+          title={'SBA Losses'}
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          viewId={sbaView?.view_id}
+          ddsViewId={disasterDeclarationsSummaryView?.view_id}
+          cols={{ 'disaster_number': 'fema_disaster_number', geoid: 'geoid', total_verified_loss: 'total_verified_loss'}}
+        />
+      </div>
     </div>
   );
 };

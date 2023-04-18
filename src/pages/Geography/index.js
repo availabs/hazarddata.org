@@ -155,7 +155,7 @@ const RenderBarChart = ({ chartDataActiveView, disaster_numbers }) => (
       keys={disaster_numbers.map(dn => `${dn}_td`)}
       indexBy={"year"}
       axisBottom={d => d}
-      axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+      axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
       paddingInner={0.1}
       hoverComp={{
         HoverComp: HoverComp,
@@ -332,7 +332,7 @@ const Geography = ({ baseUrl }) => {
         <div className={`mr-5 shrink w-full`}>
           <HazardStatBox isTotal={true} geoid={geoid} eal_source_id={ealSourceId} eal_view_id={ealViewId} />
         </div>
-        <RenderMap map_layers={map_layers} layerProps={{ hlc: { geoid, pgEnv } }} falcor={falcor} />
+        <RenderMap map_layers={map_layers} layerProps={{ hlc: { geoid: [geoid], pgEnv } }} falcor={falcor} />
       </div>
 
       <RenderStatsGrid geoid={geoid} eal_source_id={ealSourceId} eal_view_id={ealViewId} />

@@ -77,16 +77,18 @@ class EALChoroplethOptions extends LayerContainer {
   }
 
   fetchData(falcor) {
+    if(!this.props.geoid) return Promise.resolve();
+    
     const eal_source_id = 229,
       eal_view_id = 511;
-
+    console.log('fetching..', this.props.geoid)
     const dependencyPath = ['dama', this.props.pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       geomColName = 'geom',
       geomColTransform = ['st_asgeojson(geom, 9, 1) as geom'],
       geoIndices = {from: 0, to: 0},
       geoPath    = ({view_id}) =>
                         ['dama', this.props.pgEnv, 'viewsbyId', view_id,
-                        'options', JSON.stringify({ filter: { geoid: [this.props.geoid.substring(0, 2)]}}),
+                        'options', JSON.stringify({ filter: { geoid: [this.props.geoid[0].substring(0, 2)]}}),
                           'databyIndex'
                         ];
 
@@ -112,7 +114,7 @@ class EALChoroplethOptions extends LayerContainer {
   handleMapFocus(map) {
     if (this.mapFocus) {
       try {
-        if(true || ['12', '36'].includes(this.props.geoid.substring(0, 2))){
+        if(true || ['12', '36'].includes(this.props.geoid[0].substring(0, 2))){
           map.flyTo(
             {
               center:
@@ -137,14 +139,17 @@ class EALChoroplethOptions extends LayerContainer {
   paintMap(map) {
     let { geoid } = this.props
 
-    if(geoid) {
+    if(geoid?.length) {
       const colors = {}
 
       for (let id = 0; id <= 999; id += 1){
-        const gid = geoid.substring(0, 2) + id.toString().padStart(3, '0')
+        const gid = geoid[0].substring(0, 2) + id.toString().padStart(3, '0')
         colors[gid] = '#8f680f'
       }
-      colors[geoid] = '#192e98';
+
+      geoid.forEach(gid => {
+        colors[gid] = '#192e98';
+      })
 
       map.setFilter("counties", ["in", ['get', "geoid"], ['literal', Object.keys(colors)]]);
       map.setFilter("counties-line", ["in", ['get', "geoid"], ['literal', Object.keys(colors)]]);

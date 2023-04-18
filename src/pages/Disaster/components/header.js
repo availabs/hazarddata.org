@@ -38,10 +38,12 @@ export const Header = ({ viewId, disasterNumber, geoid }) => {
       "disaster_number",
       "declaration_title",
       "declaration_date",
-      "incident_type"
+      "incident_type",
+      'ARRAY_AGG(distinct fips_state_code || fips_county_code) as geoid'
     ],
     disasterDetailsOptions = JSON.stringify({
-      filter: { disaster_number: [disasterNumber] }
+      filter: { disaster_number: [disasterNumber] },
+      groupBy: [1, 2, 3, 4]
     }),
     disasterDetailsPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options", disasterDetailsOptions, "databyIndex"];
 
@@ -54,7 +56,8 @@ export const Header = ({ viewId, disasterNumber, geoid }) => {
 
   const blockLabelClass = `border-b-2`,
         blockValueClass = `font-medium pt-2 text-xl`;
-
+  const geoids = get(falcorCache, [...disasterDetailsPath(viewId), 0, 'ARRAY_AGG(distinct fips_state_code || fips_county_code) as geoid', 'value']);
+  console.log('gid', geoids)
   return (
     <div className={"flex flex-row"}>
       <div className={"w-full shrink-1 flex flex-col mr-5"}>
@@ -79,7 +82,14 @@ export const Header = ({ viewId, disasterNumber, geoid }) => {
 
         </div>
       </div>
-      <RenderMap map_layers={map_layers} layerProps={{ hlc: { geoid, pgEnv } }} falcor={falcor} />
+      <RenderMap
+        map_layers={map_layers}
+        layerProps={
+        { hlc: {
+          geoid: geoids,
+            pgEnv
+        } }}
+        falcor={falcor} />
     </div>
   );
 };
