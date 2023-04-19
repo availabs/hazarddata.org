@@ -1,4 +1,4 @@
-import {AsyncTypeahead} from 'react-bootstrap-typeahead';
+import {AsyncTypeahead, Menu, MenuItem} from 'react-bootstrap-typeahead';
 import { Link, useNavigate } from "react-router-dom";
 import get from "lodash.get";
 import { useFalcor } from "../../../modules/avl-components/src";
@@ -16,26 +16,30 @@ const onChangeFilter = (selected, setSelected, value, geoData, navigate) => {
   const geoid = get(selected, [0, 'geoid']);
   if(geoid){
     setSelected(selected);
-    navigate(`/county/${geoid}`)
+    navigate(`/geography/${geoid}`)
   }else{
     setSelected([])
   }
 }
-const menuItemsLinks = (option, props) => (
-  <ul className={`bg-gray-100`}>
-    <Link key={option.geoid} className='text-xl tracking-wide' to={`/county/${option.geoid}`}>{option.name}</Link>
-  </ul>
-)
+const menuItemsLinks = (option) => {
+  return <Link key={option.geoid} className="block hover:bg-gray-200 text-xl tracking-wide" to={`/geography/${option.geoid}`}>{option.name}</Link>;
+}
 const menuItemsList = (option, props) => (
   <ul className={`bg-gray-100`}>
     <span className={'text-xl tracking-wide'}>{option.name}</span>
   </ul>
 )
 
+const renderMenu = (results, menuProps, ...props) => (
+  <Menu className={'bg-gray-100 overflow-hidden z-10'} {...menuProps}>
+    {results.map((result, idx) => menuItemsLinks(result))}
+  </Menu>
+);
+
 const getStateData = async ({ falcor, pgEnv }) => {
   const stateViewId = 285
 
-  const geoAttributes = ['geoid', 'stusps'],
+  const geoAttributes = ['geoid', 'stusps', 'name'],
         geoOptions = JSON.stringify({}),
         geoRoute = ['dama', pgEnv, 'viewsbyId', stateViewId, 'options', geoOptions]
   const lenRes = await falcor.get([...geoRoute, 'length']);
@@ -61,13 +65,15 @@ const getCountyData = async ({ falcor, pgEnv, statesData, setGeoData }) => {
     const geoRouteIndices = {from: 0, to:  len - 1}
     const indexRes = await falcor.get([...geoRoute, 'databyIndex', geoRouteIndices, geoAttributes]);
 
-    const countyData = Object.values(get(indexRes, ['json', ...geoRoute, 'databyIndex'], {}))
+    const geoData = Object.values(get(indexRes, ['json', ...geoRoute, 'databyIndex'], {}))
       .filter(county => county.geoid)
       .map(county => {
         const state = get(statesData.find(sd => sd.geoid === county.geoid.substring(0, 2)), 'stusps', '');
         return {geoid: county.geoid, name: `${county[geoAttributesMapping.name]}, ${state}`};
       })
-    setGeoData(countyData)
+
+    geoData.push(...statesData.map(sd => ({geoid: sd.geoid, name: `${sd.name} State`})))
+    setGeoData(geoData)
   }
 }
 
@@ -84,27 +90,27 @@ export const Search = ({ className, value }) => {
   }, [pgEnv, falcor]);
 
   useEffect(() => {
-    setSelected(geoData.filter(gd => gd.geoid === value))
+    setSelected(geoData.filter(gd => value && gd.geoid === value))
   }, [geoData, value]);
 
-
   return (
-    <div className={`flex flex row ${className}`}>
+    <div className={`flex flex row ${className} w-full`}>
       <i className={`fa fa-search font-light text-xl text-gray-500 pr-2 pt-1`} />
       <AsyncTypeahead
+        className={'w-full'}
         isLoading={false}
         onSearch={handleSearch}
         minLength = {2}
-        id="county-search"
-        key="county-search"
-        placeholder="Search for a County..."
+        id="geography-search"
+        key="geography-search"
+        placeholder="Search for a Geography..."
         options={geoData}
         labelKey={(option) => `${option.name}`}
         defaultSelected={ selected }
         onChange = {(selected) => onChangeFilter(selected, setSelected, value, geoData, navigate)}
         selected={ selected }
-        inputProps={{ className: 'bg-gray-100' }}
-        renderMenuItemChildren={menuItemsLinks}
+        inputProps={{ className: 'bg-gray-100 w-full' }}
+        renderMenu={renderMenu}
       />
       </div>
   )

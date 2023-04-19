@@ -20,7 +20,11 @@
     "lodash.flatten": "^4.4.0",
     "lodash.get": "^4.4.2",
     "mapbox-gl": "^1.13.2",
+<<<<<<< HEAD
     "maplibre-gl2": "npm:maplibre-gl@^2.4.0",
+=======
+    "maplibre-gl": "^2.4.0",
+>>>>>>> 5fb5444d4d014782bd3a1f5b587ecd8b6321faf0
     "p-event": "^5.0.1",
     "pretty-bytes": "^6.0.0",
     "react": "^17.0.1",
