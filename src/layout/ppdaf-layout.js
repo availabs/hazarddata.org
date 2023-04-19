@@ -91,6 +91,11 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
 								icon: "os-icon os-icon-grid-squares2",
 							},
+							{
+								name: "",
+								path: `/datasources/settings`,
+								icon: "fad fa-gear",
+							},
 						]}
 					/>
 				</div>
