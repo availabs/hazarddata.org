@@ -82,7 +82,7 @@ export const SimpleTable = ({
         Cell: cell => {
           return mappedName.includes('disaster_number') ?
             <Link to={`/disaster/${cell.row.original.disaster_number}`}> {cell.value || 0} </Link> :
-            <div> {cell.value || 0} </div>;
+            <div> {typeof cell.value === 'object' ? cell?.value?.value || '' : cell.value || 0} </div>;
         },
         align: 'left',
         disableFilters: !['Year', 'Disaster Number', 'Event Id'].includes(mappedName)
