@@ -99,7 +99,7 @@ export const SimpleTable = ({
       <label key={title} className={"text-sm float-left capitalize"}> {title} </label>
       <>
         {
-          data.length && columns.length && (
+          data.length > 0 && columns.length > 0 && (
             <Table
               columns={columns}
               data={data}
