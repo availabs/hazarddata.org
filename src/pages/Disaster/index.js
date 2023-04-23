@@ -9,13 +9,12 @@ import { selectPgEnv } from "../DataManager/store";
 import { useParams } from "react-router-dom";
 import { AvlMap } from "../../modules/avl-map/src";
 import config from "config.json";
-import { HighlightCountyFactory } from "../Geography/components/highlightCountyLayer";
 import get from "lodash.get";
-import { BarGraph, PieGraph } from "../../modules/avl-graph/src";
-import { fnum, fnumIndex } from "../DataManager/utils/macros";
 import { Header } from "./components/header";
 import { LossOverviewGrid } from "./components/lossOverviewGrid";
-import { SimpleTable } from "./components/Table";
+import { SimpleTable } from "./components/SimpleTable";
+import { SimpleMap } from "./components/SimpleMap";
+import { ChoroplethCountyFactory } from "./components/choroplethCountyLayer";
 
 const RenderMap = ({ falcor, map_layers, layerProps }) => (
   <div className={`flex-none h-[200px] w-[300px]`}>
@@ -117,6 +116,44 @@ const Disaster = ({ baseUrl }) => {
           viewId={usdaEView?.view_id}
           ddsViewId={disasterDeclarationsSummaryView?.view_id}
           cols={{ 'disaster_number':'disaster_number', geoid: 'geoid', indemnity_amount: 'indemnity_amount'}}
+        />
+      </div>
+      <div className={'w-full h-[500px] mt-5 align-middle'}>
+        <SimpleMap
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          pgEnv={pgEnv}
+          views={[
+            {
+              id: ihpView?.view_id,
+              label: 'IHP Losses',
+              columns: ['rpfvl', 'ppfvl'],
+              paintFn: (d) => d && d.rpfvl + d.ppfvl
+            },
+            {
+              id: paView?.view_id,
+              label: 'PA Losses',
+              geoColumn: 'state_code || county_code',
+              columns: ['project_amount']
+            },
+            {
+              id: sbaView?.view_id,
+              label: 'SBA Losses',
+              disasterNumberColumn: 'fema_disaster_number',
+              columns: ['total_verified_loss']
+            },
+            {
+              id: nfipEView?.view_id,
+              label: 'NFIP Losses',
+              columns: ['total_amount_paid']
+            },
+            {
+              id: usdaEView?.view_id,
+              label: 'USDA Losses',
+              columns: ['indemnity_amount']
+            }
+          ]}
+          falcor={falcor}
         />
       </div>
     </div>

@@ -106,7 +106,7 @@ export const SimpleTable = ({
               sortBy={'Year'}
               pageSize={5}
             />
-          )
+          ) || <div className={'text-center w-full'}>No Data</div>
         }
         </>
     </div>
