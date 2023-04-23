@@ -9,39 +9,18 @@ import { Link } from "react-router-dom";
 
 export const SimpleTable = ({
   viewId,
-  ddsViewId,
   geoid,
   disaster_number,
-  cols,
+  columns,
+  attributes,
+  options,
   title = ''
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
-  const [disasterDecView, setDisasterDecView] = useState();
-  const [disasterNumbers, setDisasterNumbers] = useState([]);
-  console.log('props',  viewId,
-    ddsViewId,
-    geoid,
-    disaster_number,
-    cols)
-  const
-    geoCol = geoid ? `substring(geoid, 1, ${geoid.length})` : null,
-    disasterNumberCol = Array.isArray(cols) ? 'disaster_number' : cols.disaster_number,
-    geoOptions =
-      JSON.stringify({
-        filter:
-          geoCol && disaster_number ?
-            { [geoCol]: [geoid], [disasterNumberCol]: [disaster_number] } :
-            geoCol ?  { [geoCol]: [geoid] } :
-              disaster_number ?  { [disasterNumberCol]: [disaster_number] } : {}
-      }),
-    geoPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
 
-  const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],
-    disasterNamePath = (view_id, disasterNumbers) =>
-    ['dama', pgEnv,  "viewsbyId", view_id,
-    "options", JSON.stringify({ filter: { disaster_number: disasterNumbers}}),
-    'databyIndex']
+  const geoOptions = JSON.stringify(options),
+    geoPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
 
   useEffect(async () => {
     if(!viewId) return Promise.resolve();
@@ -51,49 +30,25 @@ export const SimpleTable = ({
           indices = { from: 0, to: len - 1 }
 
     const res = await falcor.get(
-      [...geoPath(viewId), geoOptions, 'databyIndex', indices, Array.isArray(cols) ? cols : Object.values(cols)]
+      [...geoPath(viewId), geoOptions, 'databyIndex', indices, Array.isArray(attributes) ? attributes : Object.values(attributes)]
     );
+    
 
-    const disasterNumbers = [...new Set(Object.values(get(res, ['json', ...geoPath(viewId), geoOptions, 'databyIndex'], {}))
-      .map(d => d[Array.isArray(cols) ? 'disaster_number' : cols.disaster_number])
-      .filter(d => d))];
-
-    if(disasterNumbers.length && ddsViewId){
-      setDisasterNumbers(disasterNumbers);
-      setDisasterDecView(ddsViewId);
-      await falcor.get([...disasterNamePath(ddsViewId, disasterNumbers), {from: 0, to: disasterNumbers.length - 1}, disasterNameAttributes]);
-    }
-
-  }, [geoid, viewId, ddsViewId, disaster_number, cols]);
-
-  const disasterNames = Object.values(get(falcorCache, [...disasterNamePath(disasterDecView, disasterNumbers)], {}));
+  }, [geoid, viewId, disaster_number, attributes]);
 
   const data = Object.values(get(falcorCache, [...geoPath(viewId), geoOptions, 'databyIndex'], {}));
-  const columns = (Array.isArray(cols) ? cols : Object.keys(cols))
+  columns = columns ||
+    (Array.isArray(attributes) ? attributes : Object.keys(attributes))
     .map(col => {
-      const mappedName = Array.isArray(cols) ? col : cols[col];
+      const mappedName = Array.isArray(attributes) ? col : attributes[col];
       return {
-        Header:  mappedName,
-        accessor: (c) => {
-          return mappedName.includes("disaster_number") ?
-            get(disasterNames.find(dns => dns[disasterNameAttributes[0]] === c[mappedName]),
-              "declaration_title", "No Title") + ` (${c[mappedName]})` : (c[col]);
-        },
-        Cell: cell => {
-          return mappedName.includes('disaster_number') ?
-            <Link to={`/disaster/${cell.row.original.disaster_number}`}> {cell.value || 0} </Link> :
-            <div> {typeof cell.value === 'object' ? cell?.value?.value || '' : cell.value || 0} </div>;
-        },
-        align: 'left',
-        disableFilters: !['Year', 'Disaster Number', 'Event Id'].includes(mappedName)
+        Header:  col,
+        accessor: mappedName,
+        Cell: cell => <div> {typeof cell.value === 'object' ? cell?.value?.value || '' : cell.value || 0} </div>,
+        align: 'left'
       }
     })
-
-  console.log('??',
-    data, columns
-
-  )
-
+  console.log('data?', data)
   return (
     <div className={'py-5 flex flex-col'}>
       <label key={title} className={"text-sm float-left capitalize"}> {title} </label>

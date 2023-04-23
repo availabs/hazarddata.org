@@ -72,30 +72,49 @@ const Disaster = ({ baseUrl }) => {
         <SimpleTable
           title={'IHP Losses'}
           disaster_number={disasterNumber}
-          geoid={geoid}
           viewId={ihpView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={['disaster_number', 'geoid', 'incident_type', 'rpfvl', 'ppfvl']}
+          attributes={['geoid', 'incident_type', 'rpfvl', 'ppfvl']}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
           />
       </div>
       <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'PA Losses'}
           disaster_number={disasterNumber}
-          // geoid={geoid}
           viewId={paView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={['disaster_number', 'incident_type', 'project_amount']}
+          attributes={{
+            geoid: `lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0') as geoid`,
+            incident_type: 'incident_type',
+            project_amount: 'project_amount'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0'), 1, ${geoid.length})`]: [geoid]}}
+          }}
         />
       </div>
       <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'SBA Losses'}
           disaster_number={disasterNumber}
-          geoid={geoid}
           viewId={sbaView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={{ 'disaster_number': 'fema_disaster_number', geoid: 'geoid', total_verified_loss: 'total_verified_loss'}}
+          attributes={{
+            'Geoid': 'geoid',
+            'County / Parish': 'damaged_property_county_or_parish_name',
+            'City': 'damaged_property_city_name',
+            'Loan Type': 'loan_type',
+            'Total Verified Loss': 'total_verified_loss'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"fema_disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
         />
       </div>
       <div className={'w-full mt-5 align-middle'}>
@@ -104,21 +123,38 @@ const Disaster = ({ baseUrl }) => {
           disaster_number={disasterNumber}
           geoid={geoid}
           viewId={nfipEView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={{ 'disaster_number':'disaster_number', geoid: 'geoid', total_amount_paid: 'total_amount_paid'}}
+          attributes={{
+            'disaster_number':'disaster_number',
+            geoid: 'geoid',
+            total_amount_paid: 'total_amount_paid'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
         />
       </div>
-      <div className={'w-full h-[250px] mt-5 align-middle'}>
+      <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'USDA Losses'}
           disaster_number={disasterNumber}
           geoid={geoid}
           viewId={usdaEView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={{ 'disaster_number':'disaster_number', geoid: 'geoid', indemnity_amount: 'indemnity_amount'}}
+          attributes={{
+            'disaster_number':'disaster_number',
+            geoid: 'geoid',
+            indemnity_amount: 'indemnity_amount'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
         />
       </div>
-      <div className={'w-full h-[500px] mt-5 align-middle'}>
+
+      <div className={'w-full mt-5 align-middle'}>
         <SimpleMap
           disaster_number={disasterNumber}
           geoid={geoid}
@@ -133,7 +169,7 @@ const Disaster = ({ baseUrl }) => {
             {
               id: paView?.view_id,
               label: 'PA Losses',
-              geoColumn: 'state_code || county_code',
+              geoColumn: `lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0')`,
               columns: ['project_amount']
             },
             {

@@ -13,13 +13,16 @@ export const SimpleMap = ({ disaster_number, geoid, pgEnv, views, falcor, layerP
 
   return (
     <div className={"w-full"}>
-      <select
-        className={'w-full p-2'}
-        value={view}
-        onChange={e => setView(e.target.value)}
-      >
-        { views.map(view => <option key={view.id} value={view.id}>{view.label}</option>) }
-      </select>
+      {
+        views?.length > 1 &&
+        <select
+          className={'w-full p-3'}
+          value={view}
+          onChange={e => setView(e.target.value)}
+        >
+          { views.map(view => <option key={view.id} value={view.id}>{view.label}</option>) }
+        </select>
+      }
 
       <div className={`flex-none h-[500px] w-full`}>
         <AvlMap
