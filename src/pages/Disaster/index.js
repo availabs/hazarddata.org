@@ -9,13 +9,12 @@ import { selectPgEnv } from "../DataManager/store";
 import { useParams } from "react-router-dom";
 import { AvlMap } from "../../modules/avl-map/src";
 import config from "config.json";
-import { HighlightCountyFactory } from "../Geography/components/highlightCountyLayer";
 import get from "lodash.get";
-import { BarGraph, PieGraph } from "../../modules/avl-graph/src";
-import { fnum, fnumIndex } from "../DataManager/utils/macros";
 import { Header } from "./components/header";
 import { LossOverviewGrid } from "./components/lossOverviewGrid";
-import { SimpleTable } from "./components/Table";
+import { SimpleTable } from "./components/SimpleTable";
+import { SimpleMap } from "./components/SimpleMap";
+import { ChoroplethCountyFactory } from "./components/choroplethCountyLayer";
 
 const RenderMap = ({ falcor, map_layers, layerProps }) => (
   <div className={`flex-none h-[200px] w-[300px]`}>
@@ -38,37 +37,18 @@ const RenderMap = ({ falcor, map_layers, layerProps }) => (
   </div>
 );
 
-const DummyBlock = ({ title, className }) => <div className={className}>{title}</div>
 const Disaster = ({ baseUrl }) => {
-  const { disasterNumber, geoid } = useParams(); // geoid could be state, county or null
-  const [declarationDetails, setDeclarationDetail] = useState({});
+  const { disasterNumber, geoid } = useParams();
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
 
-  const ealSourceId = 229,
-        ealViewId = 511;
-
+  const ealViewId = 577;
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
 
-  const disasterDetailsAttributes = ['distinct disaster_number as disaster_number', 'declaration_title', 'declaration_date', 'incident_type'],
-        disasterDetailsOptions = JSON.stringify({
-          filter: {disaster_number: [disasterNumber]}
-        }),
-        disasterDetailsPath = (view_id) => ['dama', pgEnv,  "viewsbyId", view_id, "options"];
-
   useEffect(async () => {
-    falcor.get(dependencyPath).then(async res => {
-      const deps = get(res, ["json", ...dependencyPath, "dependencies"]);
-      const ihpView = deps.find(d => d.type === "individuals_and_households_program_valid_registrations_v1");
-      const paView = deps.find(d => d.type === "public_assistance_funded_projects_details_v1");
-      const sbaView = deps.find(d => d.type === "sba_disaster_loan_data_new");
-      const nfipView = deps.find(d => d.type === "fima_nfip_claims_v1");
-      const usdaView = deps.find(d => d.type === "usda_crop_insurance_cause_of_loss");
-      const disasterDeclarationsSummaryView = deps.find(d => d.type === "disaster_declarations_summaries_v2");
-      const disasterLossSummaryView = deps.find(d => d.type === "disaster_loss_summary");
-
-    });
+    falcor.get(dependencyPath);
   }, [disasterNumber, geoid]);
+
   const disasterDeclarationsSummaryView =
     get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'disaster_declarations_summaries_v2');
   const disasterLossSummaryView =
@@ -79,39 +59,137 @@ const Disaster = ({ baseUrl }) => {
     get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'public_assistance_funded_projects_details_v1');
   const sbaView =
     get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'sba_disaster_loan_data_new');
+  const nfipEView =
+    get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'fima_nfip_claims_v1_enhanced');
+  const usdaEView =
+    get(falcorCache, [...dependencyPath, 'value', 'dependencies'], []).find(dep => dep.type === 'usda_crop_insurance_cause_of_loss_enhanced');
 
   return (
     <div className="max-w-6xl mx-auto p-4 my-1 block">
       <Header viewId={disasterDeclarationsSummaryView?.view_id} disasterNumber={disasterNumber} geoid={geoid}/>
       <LossOverviewGrid viewId={disasterLossSummaryView?.view_id} disasterNumbers={disasterNumber} geoid={geoid} />
-      <div className={'w-full h-[250px] mt-5 align-middle'}>
+      <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'IHP Losses'}
           disaster_number={disasterNumber}
-          geoid={geoid}
           viewId={ihpView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={['disaster_number', 'geoid', 'incident_type', 'rpfvl', 'ppfvl']}
+          attributes={['geoid', 'incident_type', 'rpfvl', 'ppfvl']}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
           />
       </div>
-      <div className={'w-full h-[250px] mt-5 align-middle'}>
+      <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'PA Losses'}
           disaster_number={disasterNumber}
-          // geoid={geoid}
           viewId={paView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={['disaster_number', 'incident_type', 'project_amount']}
+          attributes={{
+            geoid: `lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0') as geoid`,
+            incident_type: 'incident_type',
+            project_amount: 'project_amount'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0'), 1, ${geoid.length})`]: [geoid]}}
+          }}
         />
       </div>
-      <div className={'w-full h-[250px] mt-5 align-middle'}>
+      <div className={'w-full mt-5 align-middle'}>
         <SimpleTable
           title={'SBA Losses'}
           disaster_number={disasterNumber}
-          geoid={geoid}
           viewId={sbaView?.view_id}
-          ddsViewId={disasterDeclarationsSummaryView?.view_id}
-          cols={{ 'disaster_number': 'fema_disaster_number', geoid: 'geoid', total_verified_loss: 'total_verified_loss'}}
+          attributes={{
+            'Geoid': 'geoid',
+            'County / Parish': 'damaged_property_county_or_parish_name',
+            'City': 'damaged_property_city_name',
+            'Loan Type': 'loan_type',
+            'Total Verified Loss': 'total_verified_loss'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"fema_disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
+        />
+      </div>
+      <div className={'w-full mt-5 align-middle'}>
+        <SimpleTable
+          title={'NFIP Losses'}
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          viewId={nfipEView?.view_id}
+          attributes={{
+            'disaster_number':'disaster_number',
+            geoid: 'geoid',
+            total_amount_paid: 'total_amount_paid'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
+        />
+      </div>
+      <div className={'w-full mt-5 align-middle'}>
+        <SimpleTable
+          title={'USDA Losses'}
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          viewId={usdaEView?.view_id}
+          attributes={{
+            'disaster_number':'disaster_number',
+            geoid: 'geoid',
+            indemnity_amount: 'indemnity_amount'
+          }}
+          options={{
+            filter: {
+              ...disasterNumber && {"disaster_number": [disasterNumber]},
+              ...geoid && {[`substring(geoid, 1, ${geoid.length})`]: [geoid]}}
+          }}
+        />
+      </div>
+
+      <div className={'w-full mt-5 align-middle'}>
+        <SimpleMap
+          disaster_number={disasterNumber}
+          geoid={geoid}
+          pgEnv={pgEnv}
+          views={[
+            {
+              id: ihpView?.view_id,
+              label: 'IHP Losses',
+              columns: ['rpfvl', 'ppfvl'],
+              paintFn: (d) => d && d.rpfvl + d.ppfvl
+            },
+            {
+              id: paView?.view_id,
+              label: 'PA Losses',
+              geoColumn: `lpad(state_number_code::text, 2, '0') || lpad(county_code::text, 3, '0')`,
+              columns: ['project_amount']
+            },
+            {
+              id: sbaView?.view_id,
+              label: 'SBA Losses',
+              disasterNumberColumn: 'fema_disaster_number',
+              columns: ['total_verified_loss']
+            },
+            {
+              id: nfipEView?.view_id,
+              label: 'NFIP Losses',
+              columns: ['total_amount_paid']
+            },
+            {
+              id: usdaEView?.view_id,
+              label: 'USDA Losses',
+              columns: ['indemnity_amount']
+            }
+          ]}
+          falcor={falcor}
         />
       </div>
     </div>

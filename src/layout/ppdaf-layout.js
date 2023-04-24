@@ -79,22 +79,27 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 							{
 								name: "Docs",
 								path: `/docs`,
-								icon: "os-icon os-icon-home-10",
+								icon: "fa-regular fa-file",
 							},
 							{
 								name: "Geography",
 								path: `/geography/36001`,
-								icon: "os-icon os-icon-home-10",
+								icon: "fa-regular fa-globe-stand",
 							},
 							{
 								name: "Data Sources",
 								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
-								icon: "os-icon os-icon-grid-squares2",
+								icon: "fa-regular fa-database",
 							},
 							{
-								name: "",
+								name: "Create Source",
+								path: `/datasources/create/source`,
+								icon: "fa-regular fa-add",
+							},
+							{
+								name: "Settings",
 								path: `/datasources/settings`,
-								icon: "fad fa-gear",
+								icon: "fa-regular fa-gear",
 							},
 						]}
 					/>

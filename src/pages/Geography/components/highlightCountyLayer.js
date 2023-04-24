@@ -78,9 +78,9 @@ class EALChoroplethOptions extends LayerContainer {
 
   fetchData(falcor) {
     if(!this.props.geoid) return Promise.resolve();
-    
+
     const eal_source_id = 229,
-      eal_view_id = 511;
+      eal_view_id = 577;
     console.log('fetching..', this.props.geoid)
     const dependencyPath = ['dama', this.props.pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       geomColName = 'geom',
