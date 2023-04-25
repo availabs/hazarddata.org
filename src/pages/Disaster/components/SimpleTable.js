@@ -43,7 +43,7 @@ export const SimpleTable = ({
     .map((col, i) => {
       const mappedName = Array.isArray(attributes) ? col : attributes[col];
       return {
-        Header:  col,
+        Header:  col.replace(/_/g, ' '),
         accessor: mappedName,
         Cell: cell => <div> {typeof cell.value === 'object' ? cell?.value?.value || '' : cell.value || 0} </div>,
         align: 'left',
