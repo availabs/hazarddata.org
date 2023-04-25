@@ -197,7 +197,7 @@ const Home = ({ baseUrl = "/datasources" }) => {
 
   const reformattedNRILts = ReformatNRI(nriLts);
   const { formattedData: reformattedEnhancedNCEILts, nri_categories } = ReformatEnhancedNCEI(enhancedNCEILossLts);
-  const blockClasses = `w-full p-4 my-1 max-w-5xl mx-auto block border flex flex-col`;
+  const blockClasses = `w-full p-4 my-1 max-w-6xl mx-auto block border flex flex-col`;
   console.log(falcorCache, dama, srcMeta, enhancedNCEILTSViewId)
   return (
     <>
@@ -214,8 +214,8 @@ const Home = ({ baseUrl = "/datasources" }) => {
           data={reformattedEnhancedNCEILts}
           keys={nri_categories}
           indexBy={"year"}
-          axisBottom={d => d}
-          axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
           paddingInner={0.05}
           colors={(value, ii, d, key) => get(hazardsMeta, [key, "color"], "#ccc")}
           // hoverComp={{
@@ -235,8 +235,8 @@ const Home = ({ baseUrl = "/datasources" }) => {
           data={ealAvailLts}
           keys={["swd_buildings", "swd_crop", "swd_population"]}
           indexBy={"nri_category"}
-          axisBottom={d => d}
-          axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
           paddingInner={0.05}
           colors={(value, ii, d, key) => ctypeColors[key.split("_")[1]]}
           // hoverComp={{
@@ -253,8 +253,8 @@ const Home = ({ baseUrl = "/datasources" }) => {
           data={reformattedNRILts}
           keys={["buildings", "crop", "population"]}
           indexBy={"nri_category"}
-          axisBottom={d => d}
-          axisLeft={{ format: fnumIndex, gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
           paddingInner={0.05}
           colors={(value, ii, d, key) => ctypeColors[key]}
           // hoverComp={{

@@ -161,6 +161,12 @@ const Disaster = ({ baseUrl }) => {
           pgEnv={pgEnv}
           views={[
             {
+              id: disasterLossSummaryView?.view_id,
+              label: 'Total Losses',
+              columns: ['ihp_loss', 'pa_loss', 'sba_loss', 'nfip_loss', 'fema_crop_damage'],
+              paintFn: (d) => d && +d.ihp_loss + +d.pa_loss + +d.sba_loss + +d.nfip_loss + +d.fema_crop_damage
+            },
+            {
               id: ihpView?.view_id,
               label: 'IHP Losses',
               columns: ['rpfvl', 'ppfvl'],

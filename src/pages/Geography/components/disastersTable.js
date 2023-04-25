@@ -24,8 +24,8 @@ const colAccessNameMapping = {
 }
 export const DisastersTable = ({
   type= 'non-declared',
-  fusionViewId = 506,
-  geoid = '36001'
+  fusionViewId,
+  geoid
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);

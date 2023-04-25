@@ -107,7 +107,7 @@ class EALChoroplethOptions extends LayerContainer {
             ...Object.keys(record || {})
               .filter(key => key !== 'geoid')
               .map(key => [key, fnum(get(record, key))]),
-            currentView?.paintFn ? ['Total', currentView.paintFn(record)] : null
+            currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record) || 0)] : null
           ];
         console.log(record, this.data);
         return response;
