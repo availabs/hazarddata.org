@@ -258,15 +258,16 @@ const ppdaf = () => {
                 full: 'px-10 py-5'
             }
             return {
-                tableHeader:
-                    `${sizes[size]} py-1 border-b-2 bg-gray-100 border-gray-200 text-left font-medium text-gray-600  first:rounded-tl-md last:rounded-tr-md`,
-                tableInfoBar: "bg-white",
-                tableRow: `${colors[color]} transition ease-in-out duration-150 border-b border-gray-100`,
-                tableRowStriped: `bg-gray-100 even:bg-gray-200 hover:bg-gray-300 transition ease-in-out duration-150`,
-                tableCell: `${sizes[size]} whitespace-no-wrap`,
-                inputSmall: 'w-24',
-                sortIconDown: 'px-2 text-sm fa fa-chevron-down',
-                sortIconUp: 'px-2 text-sm fa fa-chevron-up',
+              tableHeader:
+                `${sizes[size]} pb-1 h-8 border border-b-4 border-gray-200 bg-white text-left font-medium text-gray-700 uppercase first:rounded-tl-md last:rounded-tr-md capitalize`,
+              tableInfoBar: "bg-white",
+              tableRow: `${colors[color]} transition ease-in-out duration-150 hover:bg-gray-300`,
+              tableRowStriped: `bg-white odd:bg-gray-100 hover:bg-gray-200 transition ease-in-out duration-150`,
+              tableCell: `${sizes[size]} break-words border border-gray-200 pl-1 align-top font-light text-sm`,
+              inputSmall: 'w-24',
+              sortIconDown: 'fas fa-sort-amount-down text-gray-500 opacity-75',
+              sortIconUp: 'fas fa-sort-amount-up text-gray-500 opacity-75',
+              sortIconIdeal: 'fa fa-bars text-gray-500 opacity-25',
                 vars: {
                     color: colors,
                     size: sizes
