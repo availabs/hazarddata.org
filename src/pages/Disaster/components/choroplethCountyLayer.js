@@ -107,7 +107,7 @@ class EALChoroplethOptions extends LayerContainer {
             ...Object.keys(record || {})
               .filter(key => key !== 'geoid')
               .map(key => [key, fnum(get(record, key))]),
-            currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record) || 0)] : null
+            currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record || {}) || 0)] : null
           ];
         console.log(record, this.data);
         return response;
@@ -120,7 +120,7 @@ class EALChoroplethOptions extends LayerContainer {
   }
 
   fetchData(falcor) {
-    console.log('props', this.props)
+
     const {disaster_number, geoid, view, views, pgEnv} = this.props;
 
     if(!disaster_number || !view) return Promise.resolve();
@@ -246,7 +246,6 @@ class EALChoroplethOptions extends LayerContainer {
 
         const record = this.data.find(d => d.geoid === gid) || {};
         const value = currentView?.paintFn ? currentView.paintFn(record) : record[currentView?.columns?.[0]];
-        console.log('r,v', record, value, colorScale(value))
         colors[gid] = geoids.includes(gid) && value ? colorScale(value) : '#CCC';
       }
     }
