@@ -109,7 +109,6 @@ class EALChoroplethOptions extends LayerContainer {
               .map(key => [keyMapping(key), fnum(get(record, key))]),
             currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record || {}) || 0)] : null
           ];
-        console.log(record, this.data);
         return response;
       }, []);
     }
@@ -164,7 +163,7 @@ class EALChoroplethOptions extends LayerContainer {
                 console.log('d?', data, this.data)
                 if(!data?.length) return Promise.resolve();
 
-                const geomColTransform = ['st_asgeojson(geom, 9, 1) as geom'],
+                const geomColTransform = ['st_asgeojson(st_envelope(ST_Simplify(geom, 0.1)), 9, 1) as geom'],
                   geoIndices = {from: 0, to: 0},
                   stateFips = get(data, [0, 'geoid']) || this.props.geoid,
                   geoPath    = ({view_id}) =>
@@ -187,18 +186,7 @@ class EALChoroplethOptions extends LayerContainer {
     console.log('mf?', this.mapFocus)
     if (this.mapFocus) {
       try {
-        if(this.props.geoid?.length === 5 /*&& ['12', '36'].includes(this.props.geoid)*/){
           map.fitBounds(this.mapFocus)
-        }else{
-          map.flyTo(
-            {
-              center:
-                [
-                  (this.mapFocus[0] + this.mapFocus[2]) / 2, (this.mapFocus[1] + this.mapFocus[3]) / 2
-                ],
-              zoom: 4.5
-            });
-        }
       } catch (e) {
         map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
       }

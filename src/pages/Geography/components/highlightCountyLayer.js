@@ -84,7 +84,7 @@ class EALChoroplethOptions extends LayerContainer {
     console.log('fetching..', this.props.geoid)
     const dependencyPath = ['dama', this.props.pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       geomColName = 'geom',
-      geomColTransform = ['st_asgeojson(geom, 9, 1) as geom'],
+      geomColTransform = ['st_asgeojson(st_envelope(ST_Simplify(geom, 0.1)), 9, 1) as geom'],
       geoIndices = {from: 0, to: 0},
       geoPath    = ({view_id}) =>
                         ['dama', this.props.pgEnv, 'viewsbyId', view_id,
@@ -114,20 +114,7 @@ class EALChoroplethOptions extends LayerContainer {
   handleMapFocus(map) {
     if (this.mapFocus) {
       try {
-        if(true || ['12', '36'].includes(this.props.geoid[0].substring(0, 2))){
-          map.flyTo(
-            {
-              center:
-                [
-                  // this.mapFocus[0], this.mapFocus[1]
-                  // // this.mapFocus[2], this.mapFocus[3]
-                  (this.mapFocus[0] + this.mapFocus[2]) / 2, (this.mapFocus[1] + this.mapFocus[3]) / 2
-                ],
-              zoom: 3.5
-            });
-        }else{
-          map.fitBounds(this.mapFocus)
-        }
+        map.fitBounds(this.mapFocus)
       } catch (e) {
         map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
       }
