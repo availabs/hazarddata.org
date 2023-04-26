@@ -163,7 +163,13 @@ const Disaster = ({ baseUrl }) => {
             {
               id: disasterLossSummaryView?.view_id,
               label: 'Total Losses',
-              columns: ['ihp_loss', 'pa_loss', 'sba_loss', 'nfip_loss', 'fema_crop_damage'],
+              columns: {
+                'IHP Loss': 'ihp_loss',
+                'PA Loss': 'pa_loss',
+                'SBA Loss': 'sba_loss',
+                'NFIP Loss': 'nfip_loss',
+                'USDA Loss': 'fema_crop_damage'
+              },
               paintFn: (d) => d && +d.ihp_loss + +d.pa_loss + +d.sba_loss + +d.nfip_loss + +d.fema_crop_damage
             },
             {

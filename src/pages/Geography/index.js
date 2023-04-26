@@ -135,7 +135,6 @@ const RenderMap = ({ falcor, map_layers, layerProps }) => (
       accessToken={config.MAPBOX_TOKEN}
       falcor={falcor}
       mapOptions={{
-        mapbox_logo: false,
         // dragPan: false,
         styles: [
           { name: "Light", style: "mapbox://styles/am3081/ckdfzeg1k0yed1ileckpfnllj" }

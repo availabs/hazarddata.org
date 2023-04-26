@@ -99,14 +99,14 @@ class EALChoroplethOptions extends LayerContainer {
     callback: (layerId, features, lngLat) => {
       return features.reduce((a, feature) => {
         let { view, views } = this.props;
-        const currentView = views.find(v => v.id === view);
-
+        const currentView = views.find(v => v.id.toString() === view.toString());
+        const keyMapping = key => Array.isArray(currentView?.columns) ? key : Object.keys(currentView?.columns || {}).find(k => currentView.columns[k] === key);
         let record = this.data.find(d => d.geoid === feature.properties.geoid),
           response = [
             [feature.properties.geoid, ''],
             ...Object.keys(record || {})
               .filter(key => key !== 'geoid')
-              .map(key => [key, fnum(get(record, key))]),
+              .map(key => [keyMapping(key), fnum(get(record, key))]),
             currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record || {}) || 0)] : null
           ];
         console.log(record, this.data);
@@ -127,7 +127,7 @@ class EALChoroplethOptions extends LayerContainer {
     this.data = [];
     const eal_view_id = 577;
     const currentView = views.find(v => v.id.toString() === view.toString());
-    console.log('cv?', currentView, views, view)
+    const columns = Array.isArray(currentView?.columns) ? currentView?.columns : Object.values(currentView?.columns);
 
     if(!currentView) return Promise.resolve();
 
@@ -141,7 +141,7 @@ class EALChoroplethOptions extends LayerContainer {
       }),
       attributes = {
         geoid: `${geomColName} as geoid`,
-        ...(currentView.columns || [])
+        ...(columns || [])
           .reduce((acc, curr) => ({...acc, [curr]: `sum(${curr}) as ${curr}`}) , {})
       },
       path = ['dama', pgEnv, 'viewsbyId', view, 'options', options]
@@ -222,20 +222,21 @@ class EALChoroplethOptions extends LayerContainer {
 
   paintMap(map) {
     let { geoid, view, views } = this.props
-    const currentView = views.find(v => v.id.toString() === view.toString())
+    const currentView = views.find(v => v.id.toString() === view.toString());
+    const columns = Array.isArray(currentView?.columns) ? currentView?.columns : Object.values(currentView?.columns);
 
     const colors = {};
 
     let colorScale = null;
 
     colorScale = this.getColorScale(
-      this.data.map((d) => currentView?.paintFn ? currentView.paintFn(d) : d[currentView?.columns?.[0]])
+      this.data.map((d) => currentView?.paintFn ? currentView.paintFn(d) : d[columns?.[0]])
         .filter(d => d)
     );
 
     if(geoid?.length === 5){
       const record = this.data.find(d => d.geoid === geoid);
-      const value = currentView?.paintFn ? currentView.paintFn(record) : record?.[currentView?.columns?.[0]];
+      const value = currentView?.paintFn ? currentView.paintFn(record) : record?.[columns?.[0]];
       colors[geoid] = colorScale(value);
     }else{
       const geoids = this.data.map(d => d.geoid);
@@ -245,7 +246,7 @@ class EALChoroplethOptions extends LayerContainer {
         const gid = stateFips + id.toString().padStart(3, '0');
 
         const record = this.data.find(d => d.geoid === gid) || {};
-        const value = currentView?.paintFn ? currentView.paintFn(record) : record[currentView?.columns?.[0]];
+        const value = currentView?.paintFn ? currentView.paintFn(record) : record[columns?.[0]];
         colors[gid] = geoids.includes(gid) && value ? colorScale(value) : '#CCC';
       }
     }
