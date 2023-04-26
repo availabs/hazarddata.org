@@ -258,9 +258,9 @@ const Geography = ({ baseUrl }) => {
   const [disasterNumbers, setDisasterNumbers] = useState([]);
 
   const ealSourceId = 229,
-        ealViewId = 577;
+        ealViewId = 599;
   const fusionSourceId = 336,
-        fusionViewId = 574;
+        fusionViewId = 596;
 
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
   const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],

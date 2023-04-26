@@ -42,7 +42,7 @@ const Disaster = ({ baseUrl }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
 
-  const ealViewId = 577;
+  const ealViewId = 599;
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
 
   useEffect(async () => {
