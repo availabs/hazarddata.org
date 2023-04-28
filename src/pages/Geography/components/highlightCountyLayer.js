@@ -131,7 +131,7 @@ class EALChoroplethOptions extends LayerContainer {
 
       for (let id = 0; id <= 999; id += 1){
         const gid = geoid[0].substring(0, 2) + id.toString().padStart(3, '0')
-        colors[gid] = '#8f680f'
+        colors[gid] = '#dcdad8'
       }
 
       geoid.forEach(gid => {
