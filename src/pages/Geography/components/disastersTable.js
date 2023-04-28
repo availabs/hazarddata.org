@@ -24,8 +24,8 @@ const colAccessNameMapping = {
 }
 export const DisastersTable = ({
   type= 'non-declared',
-  fusionViewId = 506,
-  geoid = '36001'
+  fusionViewId,
+  geoid
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
@@ -107,17 +107,22 @@ export const DisastersTable = ({
             const mappedName = colNameMapping[col.includes(' as ') ? col.split(' as ')[1] : col] || col;
             return {
               Header:  mappedName,
-              accessor: (c) => mappedName === 'Disaster Number' ?
-                get(disasterNames.find(dns => dns[colAccessNameMapping.disaster_number] === c.disaster_number),
-                  'declaration_title', 'No Title') + ` (${c.disaster_number})` :
-                  ['Year', 'Event Id'].includes(mappedName) ? c[col] : fnum(c[col]),
+              accessor: col,
               Cell: cell => {
+                const value = mappedName === 'Disaster Number' ?
+                  get(disasterNames.find(dns => dns[colAccessNameMapping.disaster_number] === cell.value),
+                    'declaration_title', 'No Title') + ` (${cell.value})` :
+                  ['Year', 'Event Id'].includes(mappedName) ? cell.value : fnum(cell.value)
                 return mappedName === "Disaster Number" ?
-                  <Link to={`/disaster/${cell.row.original.disaster_number}/geography/${geoid}`}> {cell.value || 0} </Link> :
-                  <div> {cell.value || 0} </div>;
+                  <Link to={`/disaster/${cell.row.original.disaster_number}/geography/${geoid}`}>
+                    {value}
+                  </Link> :
+                  <div>
+                    {value}
+                  </div>;
               },
               align: 'left',
-              disableFilters: !['Year', 'Disaster Number', 'Event Id'].includes(mappedName)
+              filter: mappedName === 'Disaster Number' && 'text'
             }
           })
         }
@@ -125,8 +130,10 @@ export const DisastersTable = ({
         Object.values(get(falcorCache, [...fusionPath(fusionViewId), fusionOptions, 'databyIndex'], {}))
               .filter(a => typeof a[fusionAttributes[1]] !== 'object')
       }
-        sortBy={'Year'}
+        sortBy={fusionAttributes[10]}
+        sortOrder={'desc'}
         pageSize={5}
+        striped={true}
       />
     </div>
   )

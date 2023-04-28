@@ -40,7 +40,9 @@ const ProcessDataForMap = (data, disasterNames) => React.useMemo(() => {
     const lossData = data
       .filter(d => d.year === year)
       .reduce((acc, d) => {
-        const tmpDn = d.disaster_number === 'SWD' ? d.disaster_number : get(disasterNames, [d.disaster_number], 'No Title') + ` (${d.disaster_number})`;
+        const nri_category = d.nri_category;
+        const tmpDn = d.disaster_number === 'SWD' ? d.disaster_number :
+          get(disasterNames, [d.disaster_number], 'No Title') + ` (${d.disaster_number} - ${nri_category})`;
         const tmpPd = +d.fusion_property_damage || 0,
               tmpCd =  +d.fusion_crop_damage || 0,
               tmptd = tmpPd + tmpCd + (+d.swd_population_damage || 0);
@@ -69,7 +71,8 @@ const ProcessDataForMap = (data, disasterNames) => React.useMemo(() => {
           ...acc, ...{
             [`${tmpDn}_pd`]: (acc[[`${tmpDn}_pd`]] || 0) + tmpPd,
             [`${tmpDn}_cd`]: (acc[`${tmpDn}_cd`] || 0) + tmpCd,
-            [`${tmpDn}_td`]: (acc[`${tmpDn}_td`] || 0) + tmptd
+            [`${tmpDn}_td`]: (acc[`${tmpDn}_td`] || 0) + tmptd,
+            [`${tmpDn}_nri_category`]: nri_category
           }
         };
       }, {});
@@ -77,7 +80,7 @@ const ProcessDataForMap = (data, disasterNames) => React.useMemo(() => {
   });
 
   return { processed_data, total: [{...swdTotal, ...ofdTotal, ...{ "year": "total" }}], disaster_numbers: [...disaster_numbers], event_ids: [...event_ids] };
-}, [data]);
+}, [data, disasterNames]);
 
 const HoverComp = ({ data, keys, indexFormat, keyFormat, valueFormat }) => {
   return (
@@ -132,8 +135,7 @@ const RenderMap = ({ falcor, map_layers, layerProps }) => (
       accessToken={config.MAPBOX_TOKEN}
       falcor={falcor}
       mapOptions={{
-        mapbox_logo: false,
-        // dragPan: false,
+        dragPan: false,
         styles: [
           { name: "Light", style: "mapbox://styles/am3081/ckdfzeg1k0yed1ileckpfnllj" }
         ]
@@ -145,18 +147,41 @@ const RenderMap = ({ falcor, map_layers, layerProps }) => (
   </div>
 );
 
+const RenderLegend = () =>
+  (
+    <div className={"grid grid-cols-9 gap-1 text-sm align-middle"}>
+      {
+        Object.keys(hazardsMeta)
+          .map(key =>
+            <div className={"h-full flex"} key={key}>
+              <span className={"rounded-full m-1"}
+                   style={{
+                     height: "15px",
+                     width: "15px",
+                     backgroundColor: get(hazardsMeta, [key, "color"], "#ccc")
+                   }} />
+              <label className={"pl-2"}>{hazardsMeta[key].name}</label>
+            </div>)
+      }
+    </div>
+  );
+
 const RenderBarChart = ({ chartDataActiveView, disaster_numbers }) => (
-  <div className={`w-full pt-10 my-1 block flex flex-col`} style={{ height: "350px" }}>
-    <label key={"nceiLossesTitle"} className={"text-lg"}> Loss by Disaster Number
+  <div className={`w-full pt-10 my-1 block flex flex-col`} style={{ height: "450px" }}>
+    <label key={"nceiLossesTitle"} className={"text-lg pb-2"}> Loss by Disaster Number
     </label>
+    <RenderLegend />
     <BarGraph
       key={"numEvents"}
       data={chartDataActiveView}
       keys={disaster_numbers.map(dn => `${dn}_td`)}
       indexBy={"year"}
-      axisBottom={d => d}
-      axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 1, gridLineColor: "#9d9c9c" }}
+      axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+      axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
       paddingInner={0.1}
+      colors={(value, ii, d, key) => {
+        return get(hazardsMeta, [d[`${key.split('_')[0]}_nri_category`], 'color'], '#be00ff')
+      }}
       hoverComp={{
         HoverComp: HoverComp,
         valueFormat: fnumIndex,
@@ -225,48 +250,6 @@ const RenderStatsGrid = ({ geoid, eal_source_id, eal_view_id }) => (
   </div>
 );
 
-const RenderDeclaredDisasters = ({ lossByYearByDisasterNumber, disaster_numbers }) => (
-  <div className={'py-5'}>
-    <label key={"nceiLossesTitle"} className={"text-lg"}> Declared Disasters
-    </label>
-    <Table
-      columns={
-        ['year', 'disaster_number', 'fusion_property_damage', 'fusion_crop_damage', 'swd_population_damage'].map(col => ({
-          Header: colNameMapping[col] || col,
-          accessor: (c) => ['year', 'disaster_number'].includes(col) ? c[col] : fnum(c[col]),
-          align: 'left',
-          disableFilters: !['year', 'disaster_number'].includes(col)
-        }))
-      }
-      data={lossByYearByDisasterNumber.filter(row => disaster_numbers.includes(row.disaster_number)).sort((a,b) => +b.year - +a.year)}
-      pageSize={5}
-    />
-  </div>
-
-
-);
-
-const RenderNonDeclaredEvents = ({ lossByYearByDisasterNumber, disaster_numbers }) => (
-  <div className={'py-5'}>
-    <label key={"nceiLossesTitle"} className={"text-lg"}> Non Declared Events
-    </label>
-    <Table
-      columns={
-        ['year', 'disaster_number', 'fusion_property_damage', 'fusion_crop_damage', 'swd_population_damage'].map(col => ({
-          Header:
-            col === 'disaster_number' ? 'event_id' : colNameMapping[col] || col,
-          accessor: (c) => ['year'].includes(col) ? c[col] :
-            col === 'disaster_number' ? c[col].split('_')[1] : fnum(c[col] || 0),
-          align: 'left',
-          disableFilters: !['year', 'disaster_number'].includes(col)
-        }))
-      }
-      data={lossByYearByDisasterNumber.filter(row => !disaster_numbers.includes(row.disaster_number)).sort((a,b) => +b.year - +a.year)}
-      pageSize={5}
-    />
-  </div>
-);
-
 const Geography = ({ baseUrl }) => {
   const { geoid } = useParams();
   const { falcor, falcorCache } = useFalcor();
@@ -275,9 +258,9 @@ const Geography = ({ baseUrl }) => {
   const [disasterNumbers, setDisasterNumbers] = useState([]);
 
   const ealSourceId = 229,
-        ealViewId = 577;
+        ealViewId = 599;
   const fusionSourceId = 336,
-        fusionViewId = 574;
+        fusionViewId = 596;
 
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
   const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],
@@ -314,11 +297,11 @@ const Geography = ({ baseUrl }) => {
     });
   }, [geoid]);
 
-  const disasterNames = Object.values(get(Object.values(get(falcorCache, [...disasterNamePath(disasterDecView)], {})), [0, 'databyIndex'], {}))
+  const disasterNames = useMemo(() => Object.values(get(Object.values(get(falcorCache, [...disasterNamePath(disasterDecView)], {})), [0, 'databyIndex'], {}))
     .reduce((acc, disaster) => {
-        acc[disaster['distinct disaster_number as disaster_number']] = disaster.declaration_title;
-        return acc;
-    }, {})
+      acc[disaster['distinct disaster_number as disaster_number']] = disaster.declaration_title;
+      return acc;
+    }, {}), [falcorCache]);
 
   const lossByYearByDisasterNumber = get(falcorCache, ["fusion", pgEnv, "source", fusionSourceId, "view",
     fusionViewId, "byGeoid", geoid, "lossByYearByDisasterNumber", "value"], []),
@@ -345,8 +328,8 @@ const Geography = ({ baseUrl }) => {
         </div>
 
         <div className={`flex flex-col text-sm w-full`}>
-          <DisastersTable type={'declared'} geoid={geoid}/>
-          <DisastersTable type={'non-declared'} geoid={geoid}/>
+          <DisastersTable type={'declared'} fusionViewId={fusionViewId} geoid={geoid}/>
+          <DisastersTable type={'non-declared'} fusionViewId={fusionViewId} geoid={geoid}/>
         </div>
       </div>
 

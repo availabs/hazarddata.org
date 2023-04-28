@@ -42,7 +42,7 @@ const Disaster = ({ baseUrl }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
 
-  const ealViewId = 577;
+  const ealViewId = 599;
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
 
   useEffect(async () => {
@@ -160,6 +160,18 @@ const Disaster = ({ baseUrl }) => {
           geoid={geoid}
           pgEnv={pgEnv}
           views={[
+            {
+              id: disasterLossSummaryView?.view_id,
+              label: 'Total Losses',
+              columns: {
+                'IHP Loss': 'ihp_loss',
+                'PA Loss': 'pa_loss',
+                'SBA Loss': 'sba_loss',
+                'NFIP Loss': 'nfip_loss',
+                'USDA Loss': 'fema_crop_damage'
+              },
+              paintFn: (d) => d && +d.ihp_loss + +d.pa_loss + +d.sba_loss + +d.nfip_loss + +d.fema_crop_damage
+            },
             {
               id: ihpView?.view_id,
               label: 'IHP Losses',

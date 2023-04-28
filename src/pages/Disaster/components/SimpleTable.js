@@ -14,7 +14,8 @@ export const SimpleTable = ({
   columns,
   attributes,
   options,
-  title = ''
+  title = '',
+  striped = true
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
@@ -39,16 +40,17 @@ export const SimpleTable = ({
   const data = Object.values(get(falcorCache, [...geoPath(viewId), geoOptions, 'databyIndex'], {}));
   columns = columns ||
     (Array.isArray(attributes) ? attributes : Object.keys(attributes))
-    .map(col => {
+    .map((col, i) => {
       const mappedName = Array.isArray(attributes) ? col : attributes[col];
       return {
-        Header:  col,
+        Header:  col.replace(/_/g, ' '),
         accessor: mappedName,
         Cell: cell => <div> {typeof cell.value === 'object' ? cell?.value?.value || '' : cell.value || 0} </div>,
-        align: 'left'
+        align: 'left',
+        filter: i === 0 && 'text'
       }
     })
-  console.log('data?', data)
+
   return (
     <div className={'py-5 flex flex-col'}>
       <label key={title} className={"text-sm float-left capitalize"}> {title} </label>
@@ -60,6 +62,7 @@ export const SimpleTable = ({
               data={data}
               sortBy={'Year'}
               pageSize={5}
+              striped={striped}
             />
           ) || <div className={'text-center w-full'}>No Data</div>
         }
