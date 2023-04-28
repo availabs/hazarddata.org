@@ -133,7 +133,7 @@ export const DisastersTable = ({
         sortBy={fusionAttributes[10]}
         sortOrder={'desc'}
         pageSize={5}
-        striped={true}
+        striped={false}
       />
     </div>
   )

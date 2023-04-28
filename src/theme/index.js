@@ -246,7 +246,7 @@ const ppdaf = () => {
     },
 
     table: (opts = {}) => {
-            const {color = 'white', size = 'compact'} = opts
+            const {color = 'white', size = 'full'} = opts
             let colors = {
                 white: 'bg-white hover:bg-gray-100',
                 gray: 'bg-gray-100 hover:bg-gray-200',
@@ -255,15 +255,15 @@ const ppdaf = () => {
 
             let sizes = {
                 compact: 'px-2 ',
-                full: 'px-10 py-5'
+                full: 'px-6 py-2'
             }
             return {
               tableHeader:
                 `${sizes[size]} pb-1 h-8 border border-b-4 border-gray-200 bg-white text-left font-medium text-gray-700 uppercase first:rounded-tl-md last:rounded-tr-md capitalize`,
               tableInfoBar: "bg-white",
-              tableRow: `${colors[color]} transition ease-in-out duration-150 hover:bg-gray-300`,
+              tableRow: `${colors[color]} transition ease-in-out duration-150 hover:bg-blue-100`,
               tableRowStriped: `bg-white odd:bg-gray-100 hover:bg-gray-200 transition ease-in-out duration-150`,
-              tableCell: `${sizes[size]} break-words border border-gray-200 pl-1 align-top font-light text-sm`,
+              tableCell: `${sizes[size]} break-words border border-gray-200 align-center font-light text-sm`,
               inputSmall: 'w-24',
               sortIconDown: 'fas fa-sort-amount-down text-gray-500 opacity-75',
               sortIconUp: 'fas fa-sort-amount-up text-gray-500 opacity-75',

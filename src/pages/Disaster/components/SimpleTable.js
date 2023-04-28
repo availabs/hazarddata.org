@@ -15,7 +15,7 @@ export const SimpleTable = ({
   attributes,
   options,
   title = '',
-  striped = true
+  striped = false
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
