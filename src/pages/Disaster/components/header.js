@@ -87,6 +87,7 @@ export const Header = ({ viewId, disasterNumber, geoid }) => {
         layerProps={
         { hlc: {
           geoid: geoids,
+            currentGeoid: geoid,
             pgEnv
         } }}
         falcor={falcor} />

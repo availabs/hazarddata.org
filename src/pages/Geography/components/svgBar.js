@@ -1,71 +1,89 @@
 import React from "react";
 
-function Bars({ data, height, width, color }) {
+function Bars({ data, height, radius, fontSizeOuter, fontSizeInner }) {
   return (
     <>
-      {data.map(({ value, label }) => (
-        <>
-          <rect
-            key={`bar-bg-${label}`}
-            x={0}
-            y={12}
-            width={`100%`}
-            height={height}
-            rx="15"
-            fill={'rgba(159,159,159,0.7)'}
-          />
-          <rect
-            key={`bar-${label}`}
-            x={0}
-            y={12}
-            width={`${width}%`}
-            height={height}
-            rx="15"
-            fill={color}
-          />
-          <text fill="black"
-                fillOpacity="1"
-                x={0} y={5}
-                textAnchor="left"
-                rotate="0" kerning="auto"
-                fontSize="12.5px"
-                > {label} </text>
-          <text fill="white"
-                fillOpacity="1"
+      <rect
+        key={`bar-bg}`}
+        x={0}
+        y={12}
+        width={`100%`}
+        height={height}
+        rx={radius}
+        fill={"rgba(159,159,159,0.7)"}
+      />
+      {data.map(({ value, showValue= true, valueFloat= 'left', valueCutoff = 0, label, color, width }, i) => {
+        const x = i === 0 ? 0 : data.filter((d, dI) => dI < i).reduce((acc, d) => +acc + +d.width, 0)
+        return (
+          <>
+            <rect
+              key={`bar-${label}`}
+              x={0}
+              y={12}
+              width={`${x + +width}%`}
+              height={height}
+              rx={radius}
+              fill={color}
+            />
+            {
+              label &&
+              <text fill="black"
+                    fillOpacity="1"
+                    x={0} y={5}
+                    textAnchor="left"
+                    rotate="0" kerning="auto"
+                    fontSize={fontSizeInner}
+              > {label} </text>
+            }
+            {
+              value && showValue &&
+              (valueFloat === 'left' ||( valueFloat === 'right' && +width > valueCutoff)) &&
+              <text fill="white"
+                    fillOpacity="1"
                 // stroke="white"
                 // strokeOpacity="100"
                 // strokeWidth="1"
                 // strokeLinecap="butt"
                 // strokeLinejoin="miter"
                 // strokeMiterlimit="4"
-                x={10} y={(height / 2) + 16}
-                textAnchor="left"
-                textRendering="auto"
-                fontStyle="normal" fontVariant="normal" fontWeight="bold"
-                fontSize="14.5px"  paintOrder="stroke"
-          > {value} </text>
-        </>
-      ))}
+                    x={valueFloat === 'left' ? 10 : `${x + +width - value.toString().length - 1}%`}
+                    y={(height / 2) + 15.5}
+                    textAnchor="right"
+                    textRendering="auto"
+                    fontStyle="normal" fontVariant="normal" fontWeight="bold"
+                    fontSize={fontSizeOuter} paintOrder="stroke"
+              > {value} </text>
+            }
+          </>
+        )
+      }).reverse()
+      }
     </>
   );
 }
 
 export const RenderSvgBar = ({
-                       data,
-                       height = 30,
-                       width,
-                       margin = {left:1, top: 5, right: 1, bottom: 1},
-                       color
-}) => {
+                               data,
+                               height = 30,
+                               radius = 15,
+                               fontSizeOuter = "14.5px",
+                               fontSizeInner = "12.5px",
+                               margin = { left: 0, top: 5, right: 1, bottom: 1 }
+                             }) => {
   return (
     <svg
-      className={'w-full'}
-      // width={width + margin.left + margin.right}
+      className={"w-full"}
       height={height + margin.top + margin.bottom + 10}
     >
       <g transform={`translate(${margin.left}, ${margin.top})`}>
-        <Bars data={data} height={height} width={width} color={color}/>
+        <Bars
+          data={data}
+          height={height}
+          radius={radius}
+          fontSizeOuter={fontSizeOuter}
+          fontSizeInner={fontSizeInner}
+        />
       </g>
     </svg>
-  )
-}
+  );
+};

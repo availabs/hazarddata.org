@@ -23,6 +23,7 @@ export const LossOverviewGrid = ({ viewId, disasterNumbers, geoid }) => {
     },
     disasterDetailsOptions = JSON.stringify({
       filter: geoid ? { disaster_number: [disasterNumbers], [geoIdCol]: [geoid] } : { disaster_number: [disasterNumbers] },
+      exclude: {fema_incident_begin_date: ['null']},
       groupBy: [1, 2]
     }),
     disasterDetailsPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options", disasterDetailsOptions];
@@ -43,37 +44,37 @@ export const LossOverviewGrid = ({ viewId, disasterNumbers, geoid }) => {
         <label className={blockLabelClass}>Total Loss</label>
         <span className={blockValueClass}>{
           fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.fema_property_damage], 0) +
-          get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.fema_crop_damage], 0))
+          get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.fema_crop_damage], 0), 2, true)
         }</span>
       </div>
       <div className={blockClass}>
         <label className={blockLabelClass}>IHP Loss</label>
         <span className={blockValueClass}>{
-          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.ihp_loss], 0))
+          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.ihp_loss], 0), 2, true)
         }</span>
       </div>
       <div className={blockClass}>
         <label className={blockLabelClass}>PA Loss</label>
         <span className={blockValueClass}>{
-          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.pa_loss], 0))
+          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.pa_loss], 0), 2, true)
         }</span>
       </div>
       <div className={blockClass}>
         <label className={blockLabelClass}>SBA Loss</label>
         <span className={blockValueClass}>{
-          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.sba_loss], 0))
+          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.sba_loss], 0), 2, true)
         }</span>
       </div>
       <div className={blockClass}>
         <label className={blockLabelClass}>NFIP Loss</label>
         <span className={blockValueClass}>{
-          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.nfip_loss], 0))
+          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.nfip_loss], 0), 2, true)
         }</span>
       </div>
       <div className={blockClass}>
         <label className={blockLabelClass}>USDA Loss</label>
         <span className={blockValueClass}>{
-          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.fema_crop_damage], 0))
+          fnumIndex(get(falcorCache, [...disasterDetailsPath(viewId), "databyIndex", 0, disasterDetailsAttributes.fema_crop_damage], 0), 2, true)
         }</span>
       </div>
     </div>

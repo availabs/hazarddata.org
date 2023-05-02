@@ -9,8 +9,11 @@ import { Link } from "react-router-dom";
 
 export const SimpleTable = ({
   viewId,
+  attribution = true,
+  baseUrl = '/',
   geoid,
   disaster_number,
+  dataModifier,
   columns,
   attributes,
   options,
@@ -23,6 +26,8 @@ export const SimpleTable = ({
   const geoOptions = JSON.stringify(options),
     geoPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
 
+  const attributionPath = ['dama', pgEnv, 'views', 'byId', viewId, 'attributes', ['source_id', 'view_id', 'version']];
+
   useEffect(async () => {
     if(!viewId) return Promise.resolve();
 
@@ -31,13 +36,18 @@ export const SimpleTable = ({
           indices = { from: 0, to: len - 1 }
 
     const res = await falcor.get(
-      [...geoPath(viewId), geoOptions, 'databyIndex', indices, Array.isArray(attributes) ? attributes : Object.values(attributes)]
+      [...geoPath(viewId), geoOptions, 'databyIndex', indices, Array.isArray(attributes) ? attributes : Object.values(attributes)],
+      attributionPath
     );
     
 
   }, [geoid, viewId, disaster_number, attributes]);
 
-  const data = Object.values(get(falcorCache, [...geoPath(viewId), geoOptions, 'databyIndex'], {}));
+  const attributionData = get(falcorCache, ['dama', pgEnv, 'views', 'byId', viewId, 'attributes'], {});
+
+  let data = Object.values(get(falcorCache, [...geoPath(viewId), geoOptions, 'databyIndex'], {}));
+  dataModifier && dataModifier(data);
+
   columns = columns ||
     (Array.isArray(attributes) ? attributes : Object.keys(attributes))
     .map((col, i) => {
@@ -67,6 +77,11 @@ export const SimpleTable = ({
           ) || <div className={'text-center w-full'}>No Data</div>
         }
         </>
+      <div className={'text-xs text-gray-700 p-1'}>
+        <Link to={`/${baseUrl}/source/${ attributionData?.source_id }/versions/${attributionData?.view_id}`}>
+          Attribution: { attributionData?.version }
+        </Link>
+      </div>
     </div>
   )
 }

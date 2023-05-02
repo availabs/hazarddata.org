@@ -163,7 +163,7 @@ class EALChoroplethOptions extends LayerContainer {
                 console.log('d?', data, this.data)
                 if(!data?.length) return Promise.resolve();
 
-                const geomColTransform = ['st_asgeojson(st_envelope(ST_Simplify(geom, 0.1)), 9, 1) as geom'],
+                const geomColTransform = [`st_asgeojson(st_envelope(ST_Simplify(geom, ${geoid?.length ===  5 ? `0.1` : `0.5`})), 9, 1) as geom`],
                   geoIndices = {from: 0, to: 0},
                   stateFips = get(data, [0, 'geoid']) || this.props.geoid,
                   geoPath    = ({view_id}) =>

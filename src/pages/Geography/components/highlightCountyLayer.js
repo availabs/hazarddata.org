@@ -84,7 +84,7 @@ class EALChoroplethOptions extends LayerContainer {
     console.log('fetching..', this.props.geoid)
     const dependencyPath = ['dama', this.props.pgEnv, 'viewDependencySubgraphs', 'byViewId', eal_view_id],
       geomColName = 'geom',
-      geomColTransform = ['st_asgeojson(st_envelope(ST_Simplify(geom, 0.1)), 9, 1) as geom'],
+      geomColTransform = ['st_asgeojson(st_envelope(ST_Simplify(geom, 0.5)), 9, 1) as geom'],
       geoIndices = {from: 0, to: 0},
       geoPath    = ({view_id}) =>
                         ['dama', this.props.pgEnv, 'viewsbyId', view_id,
@@ -124,18 +124,18 @@ class EALChoroplethOptions extends LayerContainer {
   }
 
   paintMap(map) {
-    let { geoid } = this.props
+    let { geoid, currentGeoid } = this.props
 
     if(geoid?.length) {
       const colors = {}
 
       for (let id = 0; id <= 999; id += 1){
         const gid = geoid[0].substring(0, 2) + id.toString().padStart(3, '0')
-        colors[gid] = '#dcdad8'
+        colors[gid] = '#cccccc'
       }
-
+      console.log('geoids', currentGeoid, geoid)
       geoid.forEach(gid => {
-        colors[gid] = '#192e98';
+        colors[gid] = gid === currentGeoid || geoid.length === 1 || !currentGeoid || currentGeoid?.length === 2 ? '#ffa600' : '#2549de';
       })
 
       map.setFilter("counties", ["in", ['get', "geoid"], ['literal', Object.keys(colors)]]);
