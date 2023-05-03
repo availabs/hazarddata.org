@@ -142,30 +142,12 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
       </div>
       <div className={`w-full ${size === "large" ? `flex flex-row justify-between` : ``}`}>
         <div className={"w-full pr-1"}>
-
           {
-            !isTotal &&
-            <div className={"w-full pt-4"}>
+            
+            <div className={"w-full pt-1"}>
               <RenderSvgBar
                 data={[{
-                  label: "Hazard Percentile",
-                  value: hazardPercentile,
-                  color: hazardsMeta[hazard].color,
-                  width: hazardPercentile
-                }]}
-                height={svgBarHeight[size]}
-                radius={svgBarRadius[size]}
-                fontSizeInner={fontSizeInner[size]}
-                fontSizeOuter={fontSizeOuter[size]}
-              />
-            </div>
-          }
-          {
-            isTotal &&
-            <div className={"w-full pt-4"}>
-              <RenderSvgBar
-                data={[{
-                  label: "National Percentile",
+                  label: "Risk",
                   value: (nationalPercentile).toFixed(2),
                   color: colors(nationalPercentile),
                   width: nationalPercentile
@@ -210,6 +192,23 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
               ${fnumIndex(get(data, ealCol, 0))}
             </span>
           </div>
+          {
+            !isTotal &&
+            <div className={"w-full -mt-4"}>
+              <RenderSvgBar
+                data={[{
+                  label: "",
+                  value: `${hazardPercentile}%`,
+                  color: hazardsMeta[hazard].color,
+                  width: hazardPercentile
+                }]}
+                height={svgBarHeight[size]}
+                radius={svgBarRadius[size]}
+                fontSizeInner={fontSizeInner[size]}
+                fontSizeOuter={fontSizeOuter[size]}
+              />
+            </div>
+          }
           <div className={blockClass[size]}><label>Actual Loss</label>
             <span className={"font-medium text-gray-800"}>
               ${fnumIndex(
