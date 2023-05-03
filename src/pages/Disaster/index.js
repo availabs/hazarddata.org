@@ -104,7 +104,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
     },
     paAttributes = {
       "County": "county",
-      "Damage Category": "array_agg(distinct damage_category order by damage_category) as damage_categories",
+      "Damage Category": "damage_category",
       "# Projects": "count(1) as num_projects",
       "Project Amount": "sum(project_amount) as project_amount",
       "Federal Share Obligated": "sum(federal_share_obligated) as federal_share_obligated",
@@ -148,6 +148,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
           disaster_number={disasterNumber}
           viewId={ihpView?.view_id}
           attributes={ihpAttributes}
+          baseUrl={baseUrl}
           options={{
             aggregatedLen: true,
             filter: {
@@ -183,6 +184,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
           disaster_number={disasterNumber}
           viewId={paView?.view_id}
           attributes={paAttributes}
+          baseUrl={baseUrl}
           options={{
             aggregatedLen: true,
             filter: {
@@ -192,7 +194,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
             exclude: {
               dcc: ["A", "B", "Z"]
             },
-            groupBy: ["county"]
+            groupBy: ["county", 'damage_category']
           }}
           columns={
             Object.keys(paAttributes)
@@ -221,6 +223,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
           disaster_number={disasterNumber}
           viewId={sbaView?.view_id}
           attributes={sbaAttributes}
+          baseUrl={baseUrl}
           options={{
             aggregatedLen: true,
             filter: {
@@ -257,6 +260,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
           geoid={geoid}
           viewId={nfipEView?.view_id}
           attributes={nfipAttributes}
+          baseUrl={baseUrl}
           options={{
             aggregatedLen: true,
             filter: {
@@ -301,8 +305,8 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
           disaster_number={disasterNumber}
           geoid={geoid}
           viewId={usdaEView?.view_id}
-          baseUrl={baseUrl}
           attributes={usdaAttributes}
+          baseUrl={baseUrl}
           options={{
             aggregatedLen: true,
             filter: {

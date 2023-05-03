@@ -135,7 +135,7 @@ class EALChoroplethOptions extends LayerContainer {
       disasterNumberColName = currentView.disasterNumberColumn || 'disaster_number',
       options = JSON.stringify({
         aggregatedLen: true,
-        filter: geoid?.length === 5 ? { [disasterNumberColName]: [disaster_number], [geomColName]: [geoid] } : { [disasterNumberColName]: [disaster_number] },
+        filter: false && geoid?.length === 5 ? { [disasterNumberColName]: [disaster_number], [geomColName]: [geoid] } : { [disasterNumberColName]: [disaster_number] },
         groupBy: [disasterNumberColName, geomColName]
       }),
       attributes = {
@@ -149,7 +149,7 @@ class EALChoroplethOptions extends LayerContainer {
       .then(async res => {
 
         const geomDep = get(res, ['json', ...dependencyPath, 'dependencies'], [])
-                          .find(d => d.type === (geoid?.length === 5 ? 'tl_county' : 'tl_state'));
+                          .find(d => d.type === (false && geoid?.length === 5 ? 'tl_county' : 'tl_state'));
         const len = get(res, ['json', ...path, 'length']);
 
        await len && falcor.get([...path, 'databyIndex', {from:0, to:len - 1}, Object.values(attributes)])
@@ -163,12 +163,12 @@ class EALChoroplethOptions extends LayerContainer {
                 console.log('d?', data, this.data)
                 if(!data?.length) return Promise.resolve();
 
-                const geomColTransform = [`st_asgeojson(st_envelope(ST_Simplify(geom, ${geoid?.length ===  5 ? `0.1` : `0.5`})), 9, 1) as geom`],
+                const geomColTransform = [`st_asgeojson(st_envelope(ST_Simplify(geom, ${false && geoid?.length ===  5 ? `0.1` : `0.5`})), 9, 1) as geom`],
                   geoIndices = {from: 0, to: 0},
-                  stateFips = get(data, [0, 'geoid']) || this.props.geoid,
+                  stateFips = get(data, [0, 'geoid']) || this.props.geoid?.substring(0, 2),
                   geoPath    = ({view_id}) =>
                     ['dama', this.props.pgEnv, 'viewsbyId', view_id,
-                      'options', JSON.stringify({ filter: { geoid: [geoid?.length === 5 ? geoid : stateFips.substring(0, 2)]}}),
+                      'options', JSON.stringify({ filter: { geoid: [false && geoid?.length === 5 ? geoid : stateFips.substring(0, 2)]}}),
                       'databyIndex'
                     ];
                 console.log('geo p', geoPath(geomDep))
@@ -210,7 +210,7 @@ class EALChoroplethOptions extends LayerContainer {
 
   paintMap(map) {
     let { geoid, view, views } = this.props
-    const currentView = views.find(v => v.id.toString() === view.toString());
+    const currentView = views.find(v => v.id?.toString() === view.toString());
     const columns = Array.isArray(currentView?.columns) ? currentView?.columns : Object.values(currentView?.columns);
 
     const colors = {};
@@ -222,13 +222,15 @@ class EALChoroplethOptions extends LayerContainer {
         .filter(d => d)
     );
 
-    if(geoid?.length === 5){
+    if(false && geoid?.length === 5){
       const record = this.data.find(d => d.geoid === geoid);
       const value = currentView?.paintFn ? currentView.paintFn(record) : record?.[columns?.[0]];
       colors[geoid] = colorScale(value);
     }else{
       const geoids = this.data.map(d => d.geoid);
-      const stateFips = (geoid || geoids[0] || '00').substring(0, 2);
+      const stateFips = (geoid?.substring(0, 2) || geoids[0] || '00').substring(0, 2);
+      console.log('????????????/', geoid?.substring(0, 2), stateFips)
+
 
       for (let id = 0; id <= 999; id += 1){
         const gid = stateFips + id.toString().padStart(3, '0');

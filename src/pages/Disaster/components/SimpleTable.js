@@ -3,7 +3,7 @@ import get from 'lodash.get';
 import { Table, useFalcor } from "../../../modules/avl-components/src";
 import { useSelector } from 'react-redux';
 import { selectPgEnv } from '../../DataManager/store';
-import { fnum } from "../../DataManager/utils/macros";
+import { fnum, formatDate } from "../../DataManager/utils/macros";
 import { Link } from "react-router-dom";
 
 
@@ -26,7 +26,7 @@ export const SimpleTable = ({
   const geoOptions = JSON.stringify(options),
     geoPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
 
-  const attributionPath = ['dama', pgEnv, 'views', 'byId', viewId, 'attributes', ['source_id', 'view_id', 'version']];
+  const attributionPath = ['dama', pgEnv, 'views', 'byId', viewId, 'attributes', ['source_id', 'view_id', 'version', '_modified_timestamp']];
 
   useEffect(async () => {
     if(!viewId) return Promise.resolve();
@@ -77,10 +77,13 @@ export const SimpleTable = ({
           ) || <div className={'text-center w-full'}>No Data</div>
         }
         </>
-      <div className={'text-xs text-gray-700 p-1'}>
-        <Link to={`/${baseUrl}/source/${ attributionData?.source_id }/versions/${attributionData?.view_id}`}>
-          Attribution: { attributionData?.version }
-        </Link>
+      <div className={'flex flex-row text-xs text-gray-700 p-1'}>
+        <label>Attribution:</label>
+        <div className={'flex flex-col pl-1'}>
+          <Link to={`/${baseUrl}/source/${ attributionData?.source_id }/versions/${attributionData?.view_id}`}>
+            { attributionData?.version } ({formatDate(attributionData?._modified_timestamp?.value)})
+          </Link>
+        </div>
       </div>
     </div>
   )

@@ -42,7 +42,7 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
     ealCol = isTotal ? "avail_eal_total" : "avail_eal";
 
   const blockClass = {
-    large: "flex flex-col pt-2",
+    large: "flex flex-col pt-2 text-sm",
     small: "flex flex-row justify-between pt-2 text-xs"
   };
   const blockWrapper = {
@@ -187,7 +187,7 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
           }
         </div>
         <div className={blockWrapper[size]}>
-          <div className={blockClass[size]}><label>EAL</label>
+          <div className={blockClass[size]}><label className={'break-word w-[25px]'}>{isTotal ? `Estimated Annual Loss (EAL)` : `EAL`}</label>
             <span className={"font-medium text-gray-800"}>
               ${fnumIndex(get(data, ealCol, 0))}
             </span>
@@ -209,19 +209,22 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
               />
             </div>
           }
-          <div className={blockClass[size]}><label>Actual Loss</label>
-            <span className={"font-medium text-gray-800"}>
-              ${fnumIndex(
-              (Object.values(
-                get(falcorCache,
-                  isTotal ? [...fusionPathTotal(fusionIds), "databyIndex"] : [...fusionPath(fusionIds), "databyIndex"],
-                  {}))
-                .find(d => d.nri_category === hazard) || {})[actualDamageCol]
-            )}
-            </span>
-          </div>
           {
-            !isTotal ?
+            !isTotal &&
+            <div className={blockClass[size]}><label>Actual Loss</label>
+              <span className={"font-medium text-gray-800"}>
+              ${fnumIndex(
+                (Object.values(
+                  get(falcorCache,
+                    isTotal ? [...fusionPathTotal(fusionIds), "databyIndex"] : [...fusionPath(fusionIds), "databyIndex"],
+                    {}))
+                  .find(d => d.nri_category === hazard) || {})[actualDamageCol]
+              )}
+            </span>
+            </div>
+          }
+          {
+            !isTotal &&
               <>
                 <div className={blockClass[size]}><label>Exposure</label>
                   <span className={"font-medium text-gray-800"}>
@@ -233,7 +236,7 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
                     {freqToText((get(falcorCache, [...nriPath(nriIds), "databyIndex", 0, freqCol], 0)).toFixed(2))}
                   </span>
                 </div>
-              </> : null
+              </>
           }
         </div>
       </div>
