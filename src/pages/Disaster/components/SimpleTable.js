@@ -22,6 +22,7 @@ export const SimpleTable = ({
                                }) => {
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
+  const [loading, setLoading] = useState(false);
 
   const geoOptions = JSON.stringify(options),
     geoPath = (view_id) => ["dama", pgEnv, "viewsbyId", view_id, "options"];
@@ -30,16 +31,19 @@ export const SimpleTable = ({
 
   useEffect(async () => {
     if(!viewId) return Promise.resolve();
+    setLoading(true)
 
     const lenRes = await falcor.get([...geoPath(viewId), geoOptions, 'length']);
     const len = Math.min(get(lenRes, ['json', ...geoPath(viewId), geoOptions, 'length'], 0), 100),
-          indices = { from: 0, to: len - 1 }
+          indices = { from: 0, to: len - 1 };
+    if(!len) setLoading(false);
 
-    const res = await falcor.get(
+    await falcor.get(
       [...geoPath(viewId), geoOptions, 'databyIndex', indices, Array.isArray(attributes) ? attributes : Object.values(attributes)],
       attributionPath
     );
-    
+
+    setLoading(false);
 
   }, [geoid, viewId, disaster_number, attributes]);
 
@@ -74,7 +78,7 @@ export const SimpleTable = ({
               pageSize={5}
               striped={striped}
             />
-          ) || <div className={'text-center w-full'}>No Data</div>
+          ) || <div className={'text-center w-full'}>{loading ? 'Loading...' : 'No Data'}</div>
         }
         </>
       <div className={'flex flex-row text-xs text-gray-700 p-1'}>

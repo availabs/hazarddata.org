@@ -210,7 +210,7 @@ class EALChoroplethOptions extends LayerContainer {
 
   paintMap(map) {
     let { geoid, view, views } = this.props
-    const currentView = views.find(v => v.id?.toString() === view.toString());
+    const currentView = views.find(v => v.id?.toString() === view?.toString());
     const columns = Array.isArray(currentView?.columns) ? currentView?.columns : Object.values(currentView?.columns);
 
     const colors = {};
