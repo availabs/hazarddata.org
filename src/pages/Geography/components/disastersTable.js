@@ -115,7 +115,8 @@ export const DisastersTable = ({
         <label key={"nceiLossesTitle"} className={"text-lg capitalize"}> {type} Disasters </label>
         <Table
           columns={
-            [fusionAttributes[1], fusionAttributes[2],  fusionAttributes[11], fusionAttributes[10]].map(col => {
+            [fusionAttributes[1], fusionAttributes[2],  fusionAttributes[11],
+              fusionAttributes[8], fusionAttributes[9], fusionAttributes[7]].map(col => {
               const mappedName = mapColName(col);
               return {
                 Header:  mappedName,
