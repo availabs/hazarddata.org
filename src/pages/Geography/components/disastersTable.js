@@ -116,7 +116,7 @@ export const DisastersTable = ({
         <Table
           columns={
             [fusionAttributes[1], fusionAttributes[2],  fusionAttributes[11],
-              fusionAttributes[8], fusionAttributes[9], fusionAttributes[7]].map(col => {
+              fusionAttributes[8], fusionAttributes[9], fusionAttributes[7], fusionAttributes[10]].map(col => {
               const mappedName = mapColName(col);
               return {
                 Header:  mappedName,
