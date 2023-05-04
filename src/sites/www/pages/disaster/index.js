@@ -1,54 +1,100 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import {useFalcor} from "modules/avl-components/src";
+import {useFalcor, Table} from "modules/avl-components/src";
 import { useSelector } from "react-redux";
 import { selectPgEnv } from 'pages/DataManager/store';
 import get from "lodash.get";
+import { useTable } from 'react-table';
 
 const Disaster = (props) => {
 
  
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
-   const viewId = props.viewId; // Assuming that the viewId prop is passed to the component
-   const length = props.length; // 
+  const viewId = 537; // Assuming that the viewId prop is passed to the component
+  const length = props.length; // 
+  const options = JSON.stringify({
+    aggregatedLen: true,
+    groupBy: ['disaster_number']
+  });
 
 
+  
 
 //     route: `dama[{keys:pgEnvs}].viewsbyId[{keys:damaViewIds}].databyIndex[{integers:dataIndices}]`,
 //     route: `dama[{keys:pgEnvs}].viewsbyId[{keys:damaViewIds}].data.length`,
 
-  useEffect(() => {
-    const indexes = Array.from({ length: 11 }, (_, i) => i);
+//   useEffect(() => {
+//     const indexes = Array.from({ length: 11 }, (_, i) => i);
 
-    falcor
-      .chunk(['dama', pgEnv, 'viewsbyId', 512, 'databyIndex', indexes, ['disaster_number', 'total_obligated_amount_pa']]
-      )
-      .then(response => {
-        console.log("hello", response)
-      })
-      .catch(error => {
-        // Handle the error here
-        console.log('err', error)
-      });
-})
+//     falcor
+//       .chunk(['dama', pgEnv, 'viewsbyId', 537, 'options',options, 'length' ]
+//       )
+//       .then(response => {
+//         console.log("hello", response)
+//       })
+//       .catch(error => {
+//         // Handle the error here
+//         console.log('err', error)
+//       });
+// })
+
+const indices = [0, 1, 2, 3, 4, 5, 6]; // Replace with the appropriate array of indices
+const attributes = ['disaster_number', 'sum(ihp_Loss) as ihp_loss', 'sum(pa_Loss) as pa_loss','sum(sba_Loss) as sba_loss','sum(nfip_Loss) as nfip_loss', 'sum(fema_property_damage) as fema_property_damage','sum(fema_crop_damage) as fema_crop_damage']; // Replace with the appropriate array of attributes
+    const result = {};
+
+    useEffect(() => {
+      const fetchData = async () => {
+          const lengthResponse = await falcor.get(['dama', pgEnv, 'viewsbyId', viewId, 'options', options, 'length']);
+          const len = get(lengthResponse, ['json', 'dama', pgEnv, 'viewsbyId', viewId, 'options', options, 'length']);
+    
+          const dataResponse = await falcor.get(['dama', pgEnv, 'viewsbyId', 537, 'options', options, 'databyIndex', 
+          {from: 0, to: len - 1 }, attributes]);
+          console.log('Data response:', dataResponse);
+    
+          // process the responses here
+      }
+    
+      fetchData();
+    }, []);
+
 console.log('falcorChache-1',falcorCache)
 
-const metadata = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 512,'databyId'], {});
+//const metadata = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 537,'options',options, 'length'], {});
+const metadata = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 537, 'options',options, 'databyIndex' ], {});
+console.log('meta-data',metadata)
+
+// CODE for table component
+const data = Object.values(metadata);
+console.log('data-only',data)
+
+const columns = [
+  { Header: 'Disaster Number', accessor: 'disaster_number' },
+  { Header: 'IHP Loss', accessor: 'sum(ihp_Loss) as ihp_loss' },
+  { Header: 'PA Loss', accessor: 'sum(pa_Loss) as pa_loss' },
+  { Header: 'SBA Loss', accessor: 'sum(sba_Loss) as sba_loss' },
+  { Header: 'NFIP Loss', accessor: 'sum(nfip_Loss) as nfip_loss' },
+  { Header: 'FEMA Property Damage', accessor: 'sum(fema_property_damage) as fema_property_damage' },
+  { Header: 'FEMA Crop Damage', accessor: 'sum(fema_crop_damage) as fema_crop_damage' },
+];
 
 
-console.log(metadata)
+// END HERE 
+
+// const metadata1 = get(falcorCache, ['dama', pgEnv, 'viewsbyId', 537, 'options', options, 'databyIndex'], []);
+// const attributesData = metadata1.map(data => get(data, attributes, {}));
+// console.log('attributes data:', attributesData);
 
 // Loop over the object
-let consoleOutput = '';
+let onsoleOutput = '';
 
 
 if (typeof metadata === 'object' && metadata !== null) {
   // Loop over the object
   for (const [key, value] of Object.entries(metadata)) {
     // Log each property
-    console.log(`${value['disaster_number']}: ${value['total_obligated_amount_pa']}`);
-    consoleOutput += `${value['disaster_number']}: ${value['total_obligated_amount_pa']}\n`;
+    console.log(`${value['disaster_number']}: ${value['sum(ihp_Loss) as ihp_loss']}`);
+   // consoleOutput += `${value['disaster_number']}: ${value['total_obligated_amount_pa']}\n`;
 
   }
 } else {
@@ -88,23 +134,38 @@ if (typeof metadata === 'object' && metadata !== null) {
     <div className='min-h-screen flex-1 flex flex-col text-gray-900 bg-gray-100'>
     <div className="flex-1 flex flex-col">
     <div className="text-6xl font-bold">Disaster</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Disaster Number</th>
-          <th>Total Obligated Amount (PA)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(metadata).map(([key, value]) => (
-          <tr key={key}>
-            <td>{value['disaster_number']}</td>
-            <td>{value['total_obligated_amount_pa']}</td>
-          </tr>
+    {/*
+    <table {...getTableProps()}>
+  <thead>
+    {headerGroups.map(headerGroup => (
+      <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroup.headers.map(column => (
+          <th {...column.getHeaderProps()}>{column.render('Header')}</th>
         ))}
-      </tbody>
-    </table>
+      </tr>
+    ))}
+  </thead>
+  <tbody {...getTableBodyProps()}>
+    {rows.map((row, i) => {
+      prepareRow(row);
+      return (
+        <tr {...row.getRowProps()}>
+          {row.cells.map(cell => {
+            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+          })}
+        </tr>
+      )
+    })}
+  </tbody>
+</table>
 
+     */}
+     <Table
+     columns={columns}
+     data={data} pageSize={50}
+     />
+   
+ 
 </div> 
 </div>
   );
