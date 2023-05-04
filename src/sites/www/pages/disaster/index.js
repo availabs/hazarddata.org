@@ -69,13 +69,13 @@ const data = Object.values(metadata);
 console.log('data-only',data)
 
 const columns = [
-  { Header: 'Disaster Number', accessor: 'disaster_number' },
-  { Header: 'IHP Loss', accessor: 'sum(ihp_Loss) as ihp_loss' },
-  { Header: 'PA Loss', accessor: 'sum(pa_Loss) as pa_loss' },
-  { Header: 'SBA Loss', accessor: 'sum(sba_Loss) as sba_loss' },
-  { Header: 'NFIP Loss', accessor: 'sum(nfip_Loss) as nfip_loss' },
-  { Header: 'FEMA Property Damage', accessor: 'sum(fema_property_damage) as fema_property_damage' },
-  { Header: 'FEMA Crop Damage', accessor: 'sum(fema_crop_damage) as fema_crop_damage' },
+  { Header: 'Disaster Number', accessor: 'disaster_number', align: 'left' },
+  { Header: 'IHP Loss', accessor: 'sum(ihp_Loss) as ihp_loss', align: 'center' },
+  { Header: 'PA Loss', accessor: 'sum(pa_Loss) as pa_loss',align: 'center' },
+  { Header: 'SBA Loss', accessor: 'sum(sba_Loss) as sba_loss' , align: 'center'},
+  { Header: 'NFIP Loss', accessor: 'sum(nfip_Loss) as nfip_loss',align: 'center' },
+  { Header: 'FEMA Property Damage', accessor: 'sum(fema_property_damage) as fema_property_damage',align: 'center' },
+  { Header: 'FEMA Crop Damage', accessor: 'sum(fema_crop_damage) as fema_crop_damage',align: 'center' },
 ];
 
 
@@ -134,32 +134,7 @@ if (typeof metadata === 'object' && metadata !== null) {
     <div className='min-h-screen flex-1 flex flex-col text-gray-900 bg-gray-100'>
     <div className="flex-1 flex flex-col">
     <div className="text-6xl font-bold">Disaster</div>
-    {/*
-    <table {...getTableProps()}>
-  <thead>
-    {headerGroups.map(headerGroup => (
-      <tr {...headerGroup.getHeaderGroupProps()}>
-        {headerGroup.headers.map(column => (
-          <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-        ))}
-      </tr>
-    ))}
-  </thead>
-  <tbody {...getTableBodyProps()}>
-    {rows.map((row, i) => {
-      prepareRow(row);
-      return (
-        <tr {...row.getRowProps()}>
-          {row.cells.map(cell => {
-            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-          })}
-        </tr>
-      )
-    })}
-  </tbody>
-</table>
-
-     */}
+   
      <Table
      columns={columns}
      data={data} pageSize={50}
