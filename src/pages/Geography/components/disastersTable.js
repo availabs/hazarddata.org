@@ -138,10 +138,12 @@ export const DisastersTable = ({
                       {value}
                     </div>;
                 },
-                align: mappedName === mapColName(fusionAttributes[10]) ? 'right' : 'left',
+                align: ['Disaster Number', 'Year'].includes(mappedName) ? 'right' : 'left',
                 width: mappedName === mapColName(fusionAttributes[1]) ? '10%' :
                   mappedName === mapColName(fusionAttributes[10]) ? '20%' :
-                  mappedName === mapColName(fusionAttributes[11]) ? '20%' : '50%'
+                  mappedName === mapColName(fusionAttributes[11]) ? '20%' :
+                  mappedName === mapColName(fusionAttributes[2]) ? '40%' :
+                    '15%'
                 ,
                 filter: ['Disaster Number', 'Year'].includes(mappedName) && 'text'
               }
