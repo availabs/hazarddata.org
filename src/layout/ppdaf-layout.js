@@ -87,6 +87,11 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								icon: "fa-regular fa-globe-stand",
 							},
 							{
+								name: "Map",
+								path: `/map`,
+								icon: "fa-regular fa-map",
+							},
+							{
 								name: "Data Sources",
 								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
 								icon: "fa-regular fa-database",

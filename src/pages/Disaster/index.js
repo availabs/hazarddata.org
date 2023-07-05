@@ -38,9 +38,8 @@ const RenderMap = ({ falcor, map_layers, layerProps }) => (
   </div>
 );
 
-const valueFormat = ({ cell, textCols = [], isDollar = false, valueMapping }) => {
+const valueFormat = ({ cell, textCols = [], isDollar = false }) => {
   let value = cell?.value?.value?.join(", ") || cell.value || 0;
-  value = valueMapping ? valueMapping(value) : value;
 
   return textCols.includes(cell?.column?.Header) ? value : fnum(value, isDollar);
 };
@@ -270,9 +269,6 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
             groupBy: ['geoid']
           }}
           dataModifier={data => {
-            console.log('dataModifier', data,
-
-            );
             data.map(row => {
               row.geoid = geoNames?.find(gn => gn.geoid === row.geoid)?.namelsad || row.geoid;
             })
