@@ -114,14 +114,14 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
 
   const nationalPercentile = get(data, npCol, 0) * 100;
   const statePercentile = get(data, spCol, 0) * 100;
-  const hazardPercentile = !isTotal && data && (data.avail_eal * 100 / data.avail_eal_total).toFixed(2);
+  const hazardPercentile = !isTotal && data && (data.avail_eal * 100 / data.avail_eal_total)?.toFixed(2);
   const hazardPercentileArray = isTotal && data &&
     get(falcorCache, ["comparative_stats", pgEnv, "byEalIds", "source", eal_source_id, "view", eal_view_id, "byGeoid", geoid, "value"], [])
       .filter(row => row.geoid === geoid)
       .map(d => ({
         label: hazardsMeta[d.nri_category].name,
         color: hazardsMeta[d.nri_category].color,
-        value: (d.avail_eal * 100 / d.avail_eal_total).toFixed(2)
+        value: (d.avail_eal * 100 / d.avail_eal_total)?.toFixed(2)
       }))
       .sort((a, b) => +b.value - +a.value);
 
@@ -148,7 +148,7 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
               <RenderSvgBar
                 data={[{
                   label: "Risk",
-                  value: (nationalPercentile).toFixed(2),
+                  value: (nationalPercentile)?.toFixed(2),
                   color: colors(nationalPercentile),
                   width: nationalPercentile
                 }]}
@@ -233,7 +233,8 @@ export const HazardStatBox = ({ geoid, hazard, eal_source_id, eal_view_id, size 
                 </div>
                 <div className={blockClass[size]}><label>Frequency</label>
                   <span className={"font-medium text-gray-800"}>
-                    {freqToText((get(falcorCache, [...nriPath(nriIds), "databyIndex", 0, freqCol], 0)).toFixed(2))}
+                    {get(falcorCache, [...nriPath(nriIds), "databyIndex", 0, freqCol, 'value'], 0)}
+                    {/*{freqToText((get(falcorCache, [...nriPath(nriIds), "databyIndex", 0, freqCol], 0))?.toFixed(2))}*/}
                   </span>
                 </div>
               </>
