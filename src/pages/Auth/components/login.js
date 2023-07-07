@@ -8,7 +8,7 @@ const LoginComp = ({ email, password, update, canSubmit, handleSubmit }) => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-lg sm:rounded-md sm:px-10">
           <div className="sm:mx-auto sm:w-full sm:max-w-md border-b border-gray-200">
-            <h2 className="text-xl font-medium text-gray-900">TransportNY</h2>
+            <h2 className="text-xl font-medium text-gray-900">MitigateNY</h2>
             <p className="text-lg font-thin text-gray-600">
               <span href="#" className="font-thin text-blue-400 hover:text-blue-500">
                Login

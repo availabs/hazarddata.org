@@ -29,7 +29,8 @@ const colNameMapping = {
 }
 
 const ProcessDataForMap = (data=[], disasterNames) => React.useMemo(() => {
-  const years = [...new Set(data.map(d => d.year))];
+  const years = [...new Set(data.map(d => d.year))].filter(d => +d >= 1996);
+  //console.log('years')
   const disaster_numbers = new Set(['Non-declared Disasters']);
   const event_ids = new Set();
   const swdTotal = {swd_tpd: 0, swd_tcd: 0, swd_ttd: 0};
@@ -298,17 +299,18 @@ const RenderStatBoxes = ({ total, numDeclaredEvents, numNonDeclaredEvents }) => 
     </div>
   );
 }
+
 const Geography = ({ baseUrl = 'datasources' }) => {
-  const { geoid } = useParams();
+  const { geoid = '36' } = useParams();
   const { falcor, falcorCache } = useFalcor();
   const pgEnv = useSelector(selectPgEnv);
   const [disasterDecView, setDisasterDecView] = useState();
   const [disasterNumbers, setDisasterNumbers] = useState([]);
 
   const ealSourceId = 229,
-        ealViewId = 599;
+        ealViewId = 660;
   const fusionSourceId = 336,
-        fusionViewId = 596;
+        fusionViewId = 657;
 
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
   const disasterNameAttributes = ['distinct disaster_number as disaster_number', 'declaration_title'],
@@ -390,7 +392,7 @@ const Geography = ({ baseUrl = 'datasources' }) => {
   );
 };
 
-const countyConfig = {
+const countyConfig = [{
   name: "Geography",
   path: "/geography/:geoid",
   exact: false,
@@ -401,6 +403,31 @@ const countyConfig = {
     size: "none"
   },
   component: Geography
-};
+},
+{
+  name: "Geography",
+  path: "/:geoid",
+  exact: false,
+  auth: false,
+  mainNav: false,
+  sideNav: {
+    color: "dark",
+    size: "none"
+  },
+  component: Geography
+},
+{
+  name: "Geography",
+  path: "/",
+  exact: false,
+  auth: false,
+  mainNav: false,
+  sideNav: {
+    color: "dark",
+    size: "none"
+  },
+  component: Geography
+}
+];
 
 export default countyConfig;

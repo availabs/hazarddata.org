@@ -30,7 +30,10 @@ const App = (props) => {
   const routes = useMemo(() => {
     return [...site.Routes, ...DefaultRoutes];
   }, [site]);
-  console.log(routes)
+  
+
+  console.log('routes', routes)
+
   return (
     <BrowserRouter basename={process.env.REACT_APP_PUBLIC_URL}>
       <ScrollToTop />

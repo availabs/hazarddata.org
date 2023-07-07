@@ -52,7 +52,7 @@ const Disaster = ({ baseUrl = 'datasources' }) => {
 
   const [countyView, setCountyView] = useState();
 
-  const ealViewId = 599;
+  const ealViewId = 660;
   const dependencyPath = ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", ealViewId];
   const
     geoNamesOptions = JSON.stringify({

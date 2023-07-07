@@ -8,7 +8,7 @@ import Disaster from "./pages/Disaster"
 
 const Routes = [
     ...Auth,
-  Geography,
+  ...Geography,
   ...Disaster,
   ...DataManager(),
   ...Documentation,

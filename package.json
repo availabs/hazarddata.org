@@ -2,7 +2,7 @@
   "name": "hazarddata.org",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "/",
   "dependencies": {
     "@availabs/ams": "^1.0.17",
     "@reduxjs/toolkit": "^1.8.0",

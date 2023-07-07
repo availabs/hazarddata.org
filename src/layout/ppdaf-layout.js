@@ -90,17 +90,7 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								name: "Data Sources",
 								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
 								icon: "fa-regular fa-database",
-							},
-							{
-								name: "Create Source",
-								path: `/datasources/create/source`,
-								icon: "fa-regular fa-add",
-							},
-							{
-								name: "Settings",
-								path: `/datasources/settings`,
-								icon: "fa-regular fa-gear",
-							},
+							}
 						]}
 					/>
 				</div>

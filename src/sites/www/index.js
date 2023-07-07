@@ -1,9 +1,11 @@
 import Home from "./pages/Home"
 import Disaster from "./pages/disaster/index"
+import BuildingFootPrints from './pages/BuildingFootprints'
 
 const Routes = [
   Home,
-  Disaster
+  Disaster,
+  BuildingFootPrints
 ]
 
 const site =  {

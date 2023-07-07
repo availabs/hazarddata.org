@@ -33,7 +33,6 @@ const getData = async ({ falcor, pgEnv }) => {
     ["eal", pgEnv, "source", ealSourceId, "view", "lts", "data"],
     ["nri", pgEnv, "source", nriSourceId, "view", "lts", "totals"],
     ["ncei_storm_events_enhanced", pgEnv, "source", enhancedNCEIhlrSourceId, "view", "lts", "lossByYearByType"],
-
     ["dama", pgEnv, "viewDependencySubgraphs", "byViewId", [ltsHlrView, ltsEalView, ltsEnhancedNCEIView]]
   );
 
@@ -271,7 +270,7 @@ const config = {
   name: "",
   // title: 'Transportation Systems Management and Operations (TSMO) System Performance Dashboards',
   // icon: 'fa-duotone fa-home',
-  path: "/",
+  path: "/home",
   exact: true,
   auth: false,
   mainNav: false,

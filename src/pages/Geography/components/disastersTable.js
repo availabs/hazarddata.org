@@ -46,10 +46,10 @@ export const DisastersTable = ({
       'sum(fema_crop_damage) as fema_crop_damage',
       'sum(swd_property_damage) as swd_property_damage',
       'sum(swd_crop_damage) as swd_crop_damage',
-      'sum(swd_population_damage) as swd_population_damage',
+      'sum(swd_population_damage) * 11600000  as swd_population_damage',
       'sum(fusion_property_damage) as fusion_property_damage',
       'sum(fusion_crop_damage) as fusion_crop_damage',
-      'coalesce(sum(fusion_property_damage), 0) + coalesce(sum(fusion_crop_damage), 0) + coalesce(sum(swd_population_damage), 0) as total_fusion_damage',
+      'coalesce(sum(fusion_property_damage), 0) + coalesce(sum(fusion_crop_damage), 0) + (coalesce(sum(swd_population_damage), 0) * 11600000) as total_fusion_damage',
       'ARRAY_AGG(distinct nri_category order by nri_category) as nri_category'
     ],
     fusionLenOptions =
