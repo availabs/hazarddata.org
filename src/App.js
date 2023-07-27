@@ -8,8 +8,8 @@ import get from "lodash.get";
 import {/*getDomain,*/getSubdomain } from "utils";
 
 import {
-  DefaultLayout, Messages
-} from "modules/avl-components/src";
+  DefaultLayout
+} from "./modules/avl-components/src";
 
 import hazmit from "sites/www";
 
@@ -39,7 +39,6 @@ const App = (props) => {
           site: site.title, layout: Layout, key: i, ...route, ...props, menus: route.mainNav
         }))}
       </Routes>
-      <Messages />
     </BrowserRouter>
   );
 };
