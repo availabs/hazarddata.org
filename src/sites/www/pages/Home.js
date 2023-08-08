@@ -196,71 +196,86 @@ const Home = ({ baseUrl = "/datasources" }) => {
 
   const reformattedNRILts = ReformatNRI(nriLts);
   const { formattedData: reformattedEnhancedNCEILts, nri_categories } = ReformatEnhancedNCEI(enhancedNCEILossLts);
-  const blockClasses = `w-full p-4 my-1 max-w-6xl mx-auto block border flex flex-col`;
-  console.log(falcorCache, dama, srcMeta, enhancedNCEILTSViewId)
+  const blockClasses = `flex-1 min-w-[50%] p-2`;
+  // console.log(falcorCache, dama, srcMeta, enhancedNCEILTSViewId)
   return (
     <>
-      <div className={blockClasses} style={{ height: "600px" }}>
-        <div className={'p-2 text-3xl'}>
-          <Search className={'object-fill float-right'}/>
+      <div className='w-full    mx-auto block'>
+        <img src='/img/landing_header2.png' className='w-full'/>
+        <div className='absolute top-[100px] right-[200px] z-20 w-[650px] border'>
+          Hello Stuff
+        </div> 
+      </div>
+      <div className='flex flex-wrap'>
+        <div className={blockClasses} >
+          <div className='bg-[#f7f2e6] shadow-lg h-[500px] p-6' >
+          {/*<div className={'p-2 text-3xl'}>
+            <Search className={'object-fill float-right'}/>
+          </div>
+          <label key={"nceiLossesDeps"} className={"text-sm mb-2"}>using:
+            <RenderViewDependencies dama={dama} srcMeta={srcMeta} viewId={enhancedNCEILTSViewId} baseUrl={baseUrl}/></label>
+          <RenderLegend />*/}
+          <label key={"nceiLossesTitle"} className={"text-lg"}> NCEI Losses </label>
+          
+          <BarGraph
+            key={"nceiLosses1"}
+            data={reformattedEnhancedNCEILts}
+            keys={nri_categories}
+            indexBy={"year"}
+            axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+            axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
+            paddingInner={0.05}
+            colors={(value, ii, d, key) => get(hazardsMeta, [key, "color"], "#ccc")}
+            // hoverComp={{
+            //   HoverComp: HoverComp,
+            //   valueFormat: fnumIndex,
+            //   keyFormat: d => hazardsMeta[d].name
+            // }}
+          />
+          </div>
         </div>
-        <label key={"nceiLossesTitle"} className={"text-lg"}> NCEI Losses </label>
-        <label key={"nceiLossesDeps"} className={"text-sm mb-2"}>using:
-          <RenderViewDependencies dama={dama} srcMeta={srcMeta} viewId={enhancedNCEILTSViewId} baseUrl={baseUrl}/></label>
-        <RenderLegend />
-        <BarGraph
-          key={"nceiLosses1"}
-          data={reformattedEnhancedNCEILts}
-          keys={nri_categories}
-          indexBy={"year"}
-          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
-          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
-          paddingInner={0.05}
-          colors={(value, ii, d, key) => get(hazardsMeta, [key, "color"], "#ccc")}
-          // hoverComp={{
-          //   HoverComp: HoverComp,
-          //   valueFormat: fnumIndex,
-          //   keyFormat: d => hazardsMeta[d].name
-          // }}
-        />
-      </div>
 
-      <div className={blockClasses} style={{ height: "500px" }}>
-        <label key={"ealsAvailTitle"} className={"text-lg"}>EALs (AVAIL) </label>
-        <label key={"ealsAvailDeps"} className={"text-sm"}>using:
-          <RenderViewDependencies dama={dama} srcMeta={srcMeta} viewId={ealAvailLTSViewId} baseUrl={baseUrl}/></label>
-        <BarGraph
-          key={"ealsFromEalAvail"}
-          data={ealAvailLts}
-          keys={["swd_buildings", "swd_crop", "swd_population"]}
-          indexBy={"nri_category"}
-          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
-          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
-          paddingInner={0.05}
-          colors={(value, ii, d, key) => ctypeColors[key.split("_")[1]]}
-          // hoverComp={{
-          //   HoverComp: HoverComp,
-          //   valueFormat: fnumIndex
-          // }}
-        />
-      </div>
+        <div className={blockClasses} >
+          <div className='bg-[#f7f2e6] shadow-lg h-[500px] p-6' >
+            <label key={"ealsAvailTitle"} className={"text-lg"}>EALs (AVAIL) </label>
+            <label key={"ealsAvailDeps"} className={"text-sm"}>using:
+              <RenderViewDependencies dama={dama} srcMeta={srcMeta} viewId={ealAvailLTSViewId} baseUrl={baseUrl}/></label>
+            <BarGraph
+              key={"ealsFromEalAvail"}
+              data={ealAvailLts}
+              keys={["swd_buildings", "swd_crop", "swd_population"]}
+              indexBy={"nri_category"}
+              axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+              axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
+              paddingInner={0.05}
+              colors={(value, ii, d, key) => ctypeColors[key.split("_")[1]]}
+              // hoverComp={{
+              //   HoverComp: HoverComp,
+              //   valueFormat: fnumIndex
+              // }}
+            />
+          </div>
+        </div>
 
-      <div className={blockClasses} style={{ height: "500px" }}>
-        <label key={"ealsNriTitle"} className={"text-lg"}>EALs (NRI) </label>
-        <BarGraph
-          key={"ealsNri"}
-          data={reformattedNRILts}
-          keys={["buildings", "crop", "population"]}
-          indexBy={"nri_category"}
-          axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
-          axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
-          paddingInner={0.05}
-          colors={(value, ii, d, key) => ctypeColors[key]}
-          // hoverComp={{
-          //   HoverComp: HoverComp,
-          //   valueFormat: fnumIndex
-          // }}
-        />
+        <div className={blockClasses} >
+          <div className='bg-[#f7f2e6] shadow-lg h-[500px] p-6' >
+            <label key={"ealsNriTitle"} className={"text-lg"}>EALs (NRI) </label>
+            <BarGraph
+              key={"ealsNri"}
+              data={reformattedNRILts}
+              keys={["buildings", "crop", "population"]}
+              indexBy={"nri_category"}
+              axisBottom={{ tickDensity: 3, axisColor: '#000', axisOpacity: 0  }}
+              axisLeft={{ format: d => fnumIndex(d, 0), gridLineOpacity: 0.1, showGridLines: true, ticks: 5, axisColor: '#000', axisOpacity: 0 }}
+              paddingInner={0.05}
+              colors={(value, ii, d, key) => ctypeColors[key]}
+              // hoverComp={{
+              //   HoverComp: HoverComp,
+              //   valueFormat: fnumIndex
+              // }}
+            />
+          </div>
+        </div>
       </div>
     </>
   );
@@ -270,7 +285,7 @@ const config = {
   name: "",
   // title: 'Transportation Systems Management and Operations (TSMO) System Performance Dashboards',
   // icon: 'fa-duotone fa-home',
-  path: "/home",
+  path: "/",
   exact: true,
   auth: false,
   mainNav: false,

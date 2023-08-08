@@ -159,9 +159,9 @@ const ppdaf = () => {
 
       let colors = {
         white: {
-          contentBg: `bg-gray-100`,
-          accentColor: `${accent}-500`,
-          accentBg: `hover:bg-${accent}-500`,
+          contentBg: `bg-gradient-to-r from-[#f8f4ec] to-[#fefefe]`,
+          accentColor: `[#da4e00]`,
+          accentBg: `hover:bg-[#da4e00]`,
           borderColor: `border-${primary}-100`,
           textColor: `text-${primary}-500`,
           highlightColor: `text-${highlight}`,
@@ -179,11 +179,11 @@ const ppdaf = () => {
         compact: {
           menu: 'hidden md:flex flex-1 justify-end',
           sideItem: "flex mx-6 pr-4 py-2 text-sm font-light hover:pl-4",
-          topItem: `flex items-center text-sm px-4 border-r h-12 ${colors[color].textColor} ${colors[color].borderColor}
+          topItem: `flex items-center text-lg  font-medium px-8  h-16 ${colors[color].textColor} ${colors[color].borderColor}
             ${colors[color].accentBg} hover:${colors[color].highlightColor}`,
-          activeItem: `flex items-center text-sm px-4 border-r h-12 ${colors[color].textColor} ${colors[color].borderColor}
+          activeItem: `flex items-center text-lg  font-medium px-8 border-b border-[#da4e00]  h-16 ${colors[color].textColor} ${colors[color].borderColor}
             ${colors[color].accentBg} hover:${colors[color].highlightColor}`,
-          icon: "mr-3 text-lg",
+          icon: "mr-3 text-md fa-fw",
           responsive: 'md:hidden'
         },
         inline: {
@@ -200,10 +200,10 @@ const ppdaf = () => {
 
 
       return {
-        topnavWrapper: `w-full ${colors[color].contentBg} border-b border-gray-200`,
+        topnavWrapper: `w-full ${colors[color].contentBg} `,
         topnavContent: `flex w-full h-full`,
         topnavMenu: `${sizes[size].menu} h-full overflow-x-auto overflow-y-hidden scrollbar-sm`,
-        menuIconTop: `text-${colors[color].accentColor} ${sizes[size].icon} group-hover:${colors[color].highlightColor}`,
+        menuIconTop: `text-[#da4e00] ${sizes[size].icon} group-hover:${colors[color].highlightColor}`,
         menuOpenIcon: `fa fa-bars`,
         menuCloseIcon: `fa fa-xmark fa-fw"`,
         navitemTop: `

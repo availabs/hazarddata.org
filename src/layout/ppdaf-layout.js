@@ -29,13 +29,13 @@ const Logo = ({sideNav}) => {
 
 const Layout = ({ children, menus, sideNav, title, site }) => {
 	const theme = useTheme()
-	const themeOptions = {size: get(sideNav, 'size','micro') ,color: get(sideNav, 'color','dark')}
+	const themeOptions = {size: get(sideNav, 'size','none') ,color: get(sideNav, 'color','dark')}
 	
 	const PROJECT_HOST = getDomain(window.location.host)//psl.parse(window.location.host).domain
 	const SUBDOMAIN = getSubdomain(window.location.host)
 
 	return (
-		<div className='flex' >
+		<div className='flex ' >
 			<div className={`hidden md:block`}>
 				<div className='fixed h-screen'>
 					<SideNav 
@@ -53,18 +53,13 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 					<TopNav
 						leftMenu={
 							<>
-								<div className='flex items-center justify-center h-12'>
+								<div className='flex items-center justify-center h-16'>
 									<Link to="/" className={`${themeOptions.size === 'none' ? '' : 'md:hidden'}` }>
-										<div>
-											<img src='/nys_logo_blue.svg' className='w-full h-12' alt='New York State Logo' />
+										<div className='px-2 font-medium text-lg'>
+											Hazard Data
 										</div>
 									</Link>
-									<div 
-										className={`text-lg font-bold text-gray-800 hover:text-gray-600 cursor-pointer px-4 `}
-										
-									>
-										{site} <span className='fal fa-angle-down pl-2 relative top-[2px]'/>
-									</div>
+									
 									<div className={`text-2xl font-thin text-blue-500  flex-1` }>
 										<div className='h-[34px] overflow-hidden'> {title} </div>
 									</div>
@@ -76,10 +71,11 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 						}
 						rightMenu={<AuthMenu />}
 						menuItems={[
+							
 							{
-								name: "Docs",
-								path: `/docs`,
-								icon: "fa-regular fa-file",
+								name: "Declared Disasters",
+								path: `/disaster/4020`,
+								icon: "fa-regular fa-wind-warning",
 							},
 							{
 								name: "Geography",
@@ -92,14 +88,24 @@ const Layout = ({ children, menus, sideNav, title, site }) => {
 								icon: "fa-regular fa-map",
 							},
 							{
-								name: "Data Sources",
-								path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
-								icon: "fa-regular fa-database",
-							}
+								name: "Download",
+								path: `/datasources`,
+								icon: "fa-regular fa-download",
+							},
+							{
+								name: "Docs",
+								path: `/docs`,
+								icon: "fa-regular fa-file",
+							},
+							// {
+							// 	name: "Data Sources",
+							// 	path: `/datasources${dataManagerCats[SUBDOMAIN] ? '/cat/'+dataManagerCats[SUBDOMAIN] : ''}`,
+							// 	icon: "fa-regular fa-database",
+							// }
 						]}
 					/>
 				</div>
-				<div className={`h-full flex-1 bg-neutral-100 ${theme.sidenav(themeOptions).fixed}`}>{children}</div>
+				<div className={`px-1 h-full flex-1 bg-gradient-to-tr from-[#d7d8d5] to-[#faf2e7] ${theme.sidenav(themeOptions).fixed}`}>{children}</div>
 			</div>
 		</div>
 	);

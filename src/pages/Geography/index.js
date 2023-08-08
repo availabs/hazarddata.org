@@ -406,7 +406,7 @@ const countyConfig = [{
 },
 {
   name: "Geography",
-  path: "/:geoid",
+  path: "/geography/:geoid",
   exact: false,
   auth: false,
   mainNav: false,
@@ -418,7 +418,7 @@ const countyConfig = [{
 },
 {
   name: "Geography",
-  path: "/",
+  path: "/geo",
   exact: false,
   auth: false,
   mainNav: false,
