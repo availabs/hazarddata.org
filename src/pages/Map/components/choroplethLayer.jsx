@@ -32,23 +32,23 @@ class EALChoroplethOptions extends LayerContainer {
     {
       "id": "counties",
       "source": "counties",
-      "source-layer": "tl_2020_us_county",
+      "source-layer": "counties",
       "type": "fill",
       "paint": {
-        "fill-color": '#969696'
+        "fill-color": '#8f680f'
       }
     },
     {
       "id": "counties-line",
       "source": "counties",
-      "source-layer": "tl_2020_us_county",
+      "source-layer": "counties",
       "type": "line",
       paint: {
         "line-width": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          5, 0,
+          4, 1,
           22, 1
         ],
         "line-color": "#000000",
@@ -97,7 +97,7 @@ class EALChoroplethOptions extends LayerContainer {
       return features.reduce((a, feature) => {
         let { view: currentView, data } = this.props;
         const keyMapping = key => Array.isArray(currentView?.columns) ? key : Object.keys(currentView?.columns || {}).find(k => currentView.columns[k] === key);
-        let record = data.find(d => d.geoid === feature.properties.geoid),
+        let record = {}, //data.find(d => d.geoid === feature.properties.geoid),
           response = [
             [feature.properties.geoid, ''],
             ...Object.keys(record || {})
@@ -136,6 +136,7 @@ class EALChoroplethOptions extends LayerContainer {
     this.legend.range = colors;
     this.legend.title = title;
     // const hideLayer = geoLayer === 'counties' ? 'tracts' : 'counties';
+    console.log("geocolors--",geoColors);
     map.setFilter(geoLayer, ["in", ['get', "geoid"], ['literal', Object.keys(geoColors)]]);
     map.setFilter(`${geoLayer}-line`, ["in", ['get', "geoid"], ['literal', Object.keys(geoColors)]]);
     map.setPaintProperty(geoLayer, "fill-color", ["get", ["get", "geoid"], ["literal", geoColors]]);
@@ -148,8 +149,11 @@ class EALChoroplethOptions extends LayerContainer {
     this.handleMapFocus(map, props);
   }
 
-  // render(map, falcor) {
-  // }
+  render(map, falcor) {
+    console.log("in-render");
+    this.paintMap(map, this.props);
+    this.handleMapFocus(map, this.props);
+  }
 }
 
 export const ChoroplethCountyFactory = (options = {}) => new EALChoroplethOptions(options);

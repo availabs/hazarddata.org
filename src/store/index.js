@@ -1,4 +1,3 @@
-import { messages } from "modules/avl-components/src";
 
 import { Reducers } from "modules/ams/src";
 
@@ -12,7 +11,6 @@ export default configureStore({
   reducer: {
     data_manager,
     ...Reducers,
-    messages,
   },
 });
 
