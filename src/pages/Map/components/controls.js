@@ -20,34 +20,47 @@ export const RenderDemoControl = ({prop1, prop2, onOptionSelect, onHazardSelect}
         onHazardSelect(selectedHazard);
       }, [selectedHazard]);
 
+      const handleOptionChange = (event) => {
+        setSelectedOption(event.target.value); // Update the selected option when the user selects a value from the select tag
+      };
+
+      const handleHazardChange = (event) => {
+        setSelectedHazard(event.target.value); // Update the selected option when the user selects a value from the select tag
+      };
+
     return (
         <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: '5px' }}>
-        <div className='flex flex-1'>
-        <div className='py-3.5 px-2 text-sm text-gray-400'>Disaster Type: 
+        <div className='flex flex-1' style={{  maxWidth: '400px', marginRight: '10px' }}>
+        <div className='py-3.5 px-2 text-sm text-black-400'>Disaster Declaration: 
         </div>
         <div className='flex-1'>
+        <select  
+        className="pl-3 pr-4 py-2.5 border border-white-100 bg-white-50  mr-2 flex items-center justify-between text-sm"
+        value={selectedOption} onChange={handleOptionChange}>
+        <option value="">Select an option</option> {/* This is the default empty option */}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+   
 
-        <Dropdown control={<button style={{ background: '#f0f0f0', color: '#333', border: '1px solid #ccc', borderRadius: '4px', padding: '8px 12px', cursor: 'pointer' }}>
-        {selectedOption}</button>} className="custom-dropdown">
-        <ul style={{ background: 'white', color: 'black' }}>
-    {options.map((option) => (
-      <li key={option} onClick={() => setSelectedOption(option)}>{option}</li>
-    ))}
-  </ul>
-</Dropdown>
+       
 </div>
         </div>
         <div className='flex flex-1'>
-        <div className='py-3.5 px-2 text-sm text-gray-400'>Hazard Type: </div>
+        <div className='py-3.5 px-2 text-sm text-black-400'>Hazard Type: </div>
         <div className='flex-1'>
-        <Dropdown control={<button style={{ background: '#f0f0f0', color: '#333', border: '1px solid #ccc', borderRadius: '4px', padding: '8px 12px', cursor: 'pointer' }}>
-           {selectedHazard}</button>} className="custom-dropdown">
-           <ul style={{ background: 'white', color: 'black' }}>
-           {hazards.map((hazard) => (
-               <li key={hazard} onClick={() => setSelectedHazard(hazard)}>{hazard}</li>
-             ))}
-     </ul>
-   </Dropdown>
+        <select  
+        className="pl-3 pr-4 py-2.5 border border-white-100 bg-white-50  bg-white mr-2 flex items-center justify-between text-sm"
+        value={selectedHazard} onChange={handleHazardChange}>
+        {hazards.map((hazard) => (
+            <option key={hazard} value={hazard}>
+              {hazard}
+            </option>
+          ))}
+      </select>
    </div>
         </div>
         </div>

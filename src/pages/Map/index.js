@@ -42,8 +42,9 @@ const Map = ({baseUrl = 'datasources'}) => {
      
           
       const attributes=['geoid','sum(fusion_crop_damage + fusion_property_damage + swd_population_damage) as total_damage_sum'];
-
+      const att2=['geoid','namelsad as name'];
         let len2;
+        let len3;
        
         const data3 = []; 
 
@@ -58,26 +59,36 @@ const Map = ({baseUrl = 'datasources'}) => {
                    groupBy: ['geoid','nri_category']
                  });
 
+            const options2= JSON.stringify({
+                  //filter:{geoid: [31039]},
+                  aggregatedLen: true,
+                  groupBy: ['geoid','namelsad']
+                });
+
             const fetchData = async () => {
 
             const response2 = await falcor.get(['dama', pgEnv, 'viewsbyId', 666, 'options', options, 'length']);
             const length = response2.json.dama[pgEnv].viewsbyId[666].options[options].length;
-            
             len2=length;
 
             const response = await falcor.get(['dama', pgEnv, 'viewsbyId', 666, 'options', options, 'databyIndex', { from: 0, to: len2 }, attributes]);
             const fusiondata = response.json.dama[pgEnv].viewsbyId[666].options[options].databyIndex;
-            console.log('fd?', fusiondata)
-            console.log('length?', len2);
-            console.log('options?', options);
+
+            const response3 = await falcor.get(['dama', pgEnv, 'viewsbyId', 286, 'options', options2, 'databyIndex', { from: 0, to: 3233 }, att2])
+            const fusiondata3 = response3.json.dama[pgEnv].viewsbyId[286].options[options2].databyIndex;
+            //console.log("rresponse-3",fusiondata3);
+            // console.log('fd?', fusiondata)
+            // console.log('length?', len2);
+            // console.log('options?', options);
         
             // Extract the values of "geoid" and "sum(fusion_crop_damage + fusion_property_damage + swd_population_damage) as total_damage_sum"
-            const geoids = Object.values(fusiondata).map(record => record.geoid);
+            const geoids = Object.values(fusiondata3).map(record => record.geoid);
             const totalDamageSums = Object.values(fusiondata).map(record => record['sum(fusion_crop_damage + fusion_property_damage + swd_population_damage) as total_damage_sum']);
-        
+            const placename= Object.values(fusiondata3).map(record=>record['namelsad as name']);
             const data3 = geoids.map((geoid, index) => ({
               geoid: geoid,
-              total_damage_sum: totalDamageSums[index]
+              total_damage_sum: totalDamageSums[index],
+              place_name: placename[index]
             }));
             setData(data3);
             console.log("data-3", data3);
@@ -91,13 +102,13 @@ const Map = ({baseUrl = 'datasources'}) => {
  // color code here:
 
 const getDomain = (data = [], range = []) => {
-    console.log("getdomain-function");
+   // console.log("getdomain-function");
 
     if (!data?.length || !range?.length) return [];
     return data?.length && range?.length ? ckmeans(data, Math.min(data?.length, range?.length)) : [];
 }
 const getColorScale = (data, colors) => {
-    console.log("getcolorscale-function");
+   // console.log("getcolorscale-function");
 
     const domain = getDomain(data, colors)
 
@@ -114,30 +125,40 @@ const getGeoColors = ({ geoid, data = [], columns = [], paintFn, colors = [] }) 
     const stateFips = (geoid?.substring(0, 2) || geoids[0] || '00').substring(0, 2);
     console.log("statefips",stateFips);
     const geoColors = {};
-  
+    //console.log("records",record);
     // Extract total_damage_sum values from data
     const totalDamageSums = data.map(record => record[columns?.[0]]).filter(f => f);
-  
+    // add code here
+    //const placename= data.map(record => record[columns?.[1]]).filter(f => f);
     // Get color scale and domain using the extracted total_damage_sum values
     const colorScale = getColorScale(totalDamageSums.filter(d => d), colors);
     const domain = getDomain(totalDamageSums.filter(d => d), colors);
   
     data.forEach(record => {
       const value = paintFn ? paintFn(record) : record[columns?.[0]];
-      console.log('value?', value)
+    //  console.log('value?', value)
       geoColors[record.geoid] = value ? colorScale(value) : '#CCC';
     });
-    console.log('debugging this', totalDamageSums, colors, domain, geoColors)
+   // console.log('debugging this', totalDamageSums, colors, domain, geoColors);
     return { geoColors, domain };
   };
 
-
-const { geoColors, domain } = getGeoColors({ geoid: '36', data: data, columns: ['total_damage_sum'], paintFn: null, 
-colors: ["#FFF7EC","#FEE8C8","#FDD49E","#FDBB84","#FC8D59","#EF6548","#D7301F","#B30000","#7F0000"] });
+const colors= ["#FFF7EC","#FEE8C8","#FDD49E","#FDBB84","#FC8D59","#EF6548","#D7301F","#B30000","#7F0000"] ;
+const { geoColors, domain } = getGeoColors({ geoid: '36', data: data, 
+columns: ['total_damage_sum', 'place_name'], // changed here
+paintFn: null, 
+colors });
 console.log("geocolor",geoColors);
 console.log("domain",domain);
 const layerProps = {
-    ccl: {geoColors}
+    ccl: {
+        geoColors, 
+        data, 
+        view: {columns: {'Loss': 'total_damage_sum', 'place':'place_name'}}, // changed here
+        domain,
+        title:"title-1",
+        colors
+     }
   }
 
     return (

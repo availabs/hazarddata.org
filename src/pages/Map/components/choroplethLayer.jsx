@@ -66,30 +66,33 @@ class EALChoroplethOptions extends LayerContainer {
     show: true
   };
 
-  onHover = {
+ onHover = {
     layers: ["counties"],
     HoverComp: ({ data, layer }) => {
       return (
         <div style={{ maxHeight: "300px" }} className={`rounded relative px-1 overflow-auto scrollbarXsm bg-white`}>
           {
-            data?.length && data.map((row, i) =>
-              <div key={i} className="flex">
-                {
-                  row?.length && row.map((d, ii) =>
-                    <div key={ii}
-                      // style={{maxWidth: '200px'}}
-                         className={`
-                    ${ii === 0 ? "flex-1 font-bold" : "overflow-auto scrollbarXsm"}
-                    ${row.length > 1 && ii === 0 ? "mr-4" : ""}
-                    ${row.length === 1 && ii === 0 ? `border-b-2 text-lg ${i > 0 ? "mt-1" : ""}` : ""}
-                    `}>
-                      {d}
-                    </div>
-                  )
-                }
-              </div>
-            )
-          }
+            data?.length && data.map((row, i) => {
+              console.log("Data-array:", data); 
+              return (
+                <div key={i} className="flex">
+                  {
+                    row?.length && row.map((d, ii) =>
+                      <div key={ii}
+                        // style={{maxWidth: '200px'}}
+                        className={`
+                          ${ii === 0 ? "flex-1 font-bold" : "overflow-auto scrollbarXsm"}
+                          ${row.length > 1 && ii === 0 ? "mr-4" : ""}
+                          ${row.length === 1 && ii === 0 ? `border-b-2 text-lg ${i > 0 ? "mt-1" : ""}` : ""}
+                        `}
+                      >
+                        {d}
+                      </div>
+                    )
+                  }
+                </div>
+              );
+            })}
         </div>
       );
     },
@@ -97,14 +100,20 @@ class EALChoroplethOptions extends LayerContainer {
       return features.reduce((a, feature) => {
         let { view: currentView, data } = this.props;
         const keyMapping = key => Array.isArray(currentView?.columns) ? key : Object.keys(currentView?.columns || {}).find(k => currentView.columns[k] === key);
-        let record = {}, //data.find(d => d.geoid === feature.properties.geoid),
-          response = [
+        //columns = [];
+       
+        let record = data.find(d => d.geoid === feature.properties.geoid);
+        console.log("record",record);
+       // const record = data.find(d => d.geoid === feature.properties.geoid) || {};
+        //const totalDamageSums = data.map(record => record[columns?.[0]]).filter(f => f);
+        let  response = [
             [feature.properties.geoid, ''],
             ...Object.keys(record || {})
-              .filter(key => key !== 'geoid')
+              .filter(key => key !== 'geoid'  )
               .map(key => keyMapping(key) ? [keyMapping(key), fnum(get(record, key))] : [fnum(get(record, key))]),
             currentView?.paintFn ? ['Total', fnum(currentView.paintFn(record || {}) || 0)] : null
           ];
+          console.log("feature.properties.geoid",feature.properties.geoid);
         return response;
       }, []);
     }
